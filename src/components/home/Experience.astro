@@ -1,0 +1,36 @@
+---
+import { EXPERIENCE_IDS } from '../../data/types';
+import { joinParts } from '../../lib/format';
+import { getProfile, type Locale } from '../../lib/i18n';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = getProfile(lang);
+---
+
+<ol class="rule-list" role="list">
+  {
+    EXPERIENCE_IDS.map((id) => {
+      const role = t.experience[id];
+      return (
+        <li class="entry" data-item={id}>
+          <p class="entry__aside">{role.period}</p>
+          <div class="entry__main measure">
+            <h3 class="item-title">{role.role}</h3>
+            <p class="experience__org">{joinParts(role.org, role.place)}</p>
+            {role.summary && <p class="muted">{role.summary}</p>}
+          </div>
+        </li>
+      );
+    })
+  }
+</ol>
+
+<style>
+  .experience__org {
+    font-weight: 500;
+  }
+</style>

@@ -4,7 +4,16 @@ import Hero from './Hero.astro';
 import Section from './Section.astro';
 import SiteFooter from './SiteFooter.astro';
 import SiteHeader from './SiteHeader.astro';
-import { SECTION_IDS } from '../data/types';
+import About from './home/About.astro';
+import Affiliations from './home/Affiliations.astro';
+import Contact from './home/Contact.astro';
+import Education from './home/Education.astro';
+import Experience from './home/Experience.astro';
+import Focus from './home/Focus.astro';
+import Publications from './home/Publications.astro';
+import Skills from './home/Skills.astro';
+import Work from './home/Work.astro';
+import { SECTION_IDS, type SectionId } from '../data/types';
 import { getProfile, type Locale } from '../lib/i18n';
 
 interface Props {
@@ -13,13 +22,35 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = getProfile(lang);
+
+// One body per section id: a new id in SECTION_IDS fails the type check until it has one.
+const BODIES = {
+  about: About,
+  focus: Focus,
+  work: Work,
+  publications: Publications,
+  experience: Experience,
+  education: Education,
+  affiliations: Affiliations,
+  skills: Skills,
+  contact: Contact,
+} satisfies Record<SectionId, (props: { lang: Locale }) => unknown>;
 ---
 
 <BaseLayout lang={lang} page="home" title={t.meta.home.title} description={t.meta.home.description}>
   <SiteHeader lang={lang} page="home" />
   <main id="main">
     <Hero lang={lang} />
-    {SECTION_IDS.map((id) => <Section id={id} lang={lang} />)}
+    {
+      SECTION_IDS.map((id) => {
+        const Body = BODIES[id];
+        return (
+          <Section id={id} lang={lang}>
+            <Body lang={lang} />
+          </Section>
+        );
+      })
+    }
   </main>
   <SiteFooter lang={lang} />
 </BaseLayout>

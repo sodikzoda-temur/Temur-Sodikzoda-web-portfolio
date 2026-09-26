@@ -80,7 +80,8 @@ export default {
       title: 'CoWaSS research component',
       org: 'ISW',
       period: '2022 to present',
-      meta: ['SDC-funded', 'Partners: Helvetas, FHNW, University of Trento, BORDA Tajikistan'],
+      funding: 'SDC-funded',
+      partners: 'Partners: Helvetas, FHNW, University of Trento, BORDA Tajikistan',
       points: [
         'Coordinated the research component of Phase 1 (the phase ran from 2021 to February 2026; my role from October 2022) across four pillars: laboratory infrastructure and accreditation, international academic collaboration, DEWATS monitoring and evaluation, knowledge exchange.',
         'Wrote the Phase 1 research component final report.',
@@ -285,4 +286,4 @@ export default {
   footer: {
     copyright: 'Temur Sodikzoda',
   },
-} satisfies Profile;
+} as const satisfies Profile;

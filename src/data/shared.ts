@@ -20,3 +20,9 @@ export const LANGUAGE_NAMES: Readonly<Record<Locale, string>> = {
   en: 'English',
   ru: 'Русский',
 };
+
+/** The owner's name as it appears in citations; emphasised in the publication list. */
+export const CITATION_AUTHOR: Readonly<Record<Locale, string>> = {
+  en: 'Sodikzoda T. Kh.',
+  ru: 'Содикзода Т. Х.',
+};

@@ -1,0 +1,87 @@
+---
+import { CITATION_AUTHOR } from '../../data/shared';
+import { splitAround } from '../../lib/format';
+import { getProfile, getPublications, type Locale } from '../../lib/i18n';
+import { typesetCitation } from '../../lib/typography';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = getProfile(lang);
+
+// Newest first; entries of the same year keep their order in the data.
+const entries = [...getPublications(lang)].sort((a, b) => b.year - a.year);
+const years = [...new Set(entries.map((entry) => entry.year))];
+const author = typesetCitation(CITATION_AUTHOR[lang], lang);
+---
+
+<div class="pubs">
+  <ol class="rule-list pubs__years" role="list">
+    {
+      years.map((year) => (
+        <li class="entry entry--short" data-year={year}>
+          <h3 class="entry__aside pubs__year">{year}</h3>
+          <ol class="pubs__list" role="list">
+            {entries
+              .filter((entry) => entry.year === year)
+              .map((entry) => {
+                const parts = splitAround(entry.citation, author);
+                return (
+                  <li class="pub">
+                    <p class="pub__citation">
+                      {parts ? (
+                        <>
+                          {parts.before}
+                          <strong class="pub__author">{parts.match}</strong>
+                          {parts.after}
+                        </>
+                      ) : (
+                        entry.citation
+                      )}
+                    </p>
+                    {entry.note && <p class="pub__note">{entry.note}</p>}
+                  </li>
+                );
+              })}
+          </ol>
+        </li>
+      ))
+    }
+  </ol>
+  <p class="pubs__closing muted">{t.publications.closing}</p>
+</div>
+
+<style>
+  .pubs__year {
+    font-size: var(--step-0);
+    color: var(--brand);
+  }
+
+  .pubs__list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-m);
+    max-width: 46rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pub__author {
+    font-weight: 600;
+  }
+
+  .pub__note {
+    margin-block-start: var(--space-3xs);
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+
+  .pubs__closing {
+    margin-block-start: var(--space-l);
+    padding-block-start: var(--space-m);
+    border-top: var(--rule);
+  }
+</style>

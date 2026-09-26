@@ -1,8 +1,8 @@
 import { ALL_PATHS, MISSING_PATH, expect, test, visit } from './fixtures';
 
-const WIDTHS = [360, 390, 768, 1024, 1440];
+const WIDTHS = [320, 360, 390, 768, 1024, 1440];
 
-test.describe('layout at 360, 390, 768, 1024 and 1440px', () => {
+test.describe('layout at 320, 360, 390, 768, 1024 and 1440px, light and dark', () => {
   test.use({ allowedConsoleErrors: [/status of 404/] });
 
   for (const path of ALL_PATHS) {
@@ -13,12 +13,13 @@ test.describe('layout at 360, 390, 768, 1024 and 1440px', () => {
       const brand = page.locator('.site-header__brand');
       const hasHeader = (await brand.count()) > 0;
 
-      for (const width of WIDTHS) {
+      for (const [scheme, width] of (['light', 'dark'] as const).flatMap((s) => WIDTHS.map((w) => [s, w] as const))) {
+        await page.emulateMedia({ colorScheme: scheme });
         await page.setViewportSize({ width, height: 800 });
         const overflow = await page.evaluate(
           () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
         );
-        expect(overflow, `horizontal overflow at ${width}px`).toBeLessThanOrEqual(0);
+        expect(overflow, `horizontal overflow at ${width}px (${scheme})`).toBeLessThanOrEqual(0);
 
         if (hasHeader) {
           const lines = await brand.evaluate((element) => {
@@ -26,7 +27,7 @@ test.describe('layout at 360, 390, 768, 1024 and 1440px', () => {
             range.selectNodeContents(element);
             return new Set([...range.getClientRects()].map((rect) => Math.round(rect.top))).size;
           });
-          expect(lines, `name in the header wraps at ${width}px`).toBe(1);
+          expect(lines, `name in the header wraps at ${width}px (${scheme})`).toBe(1);
         }
       }
     });
@@ -68,11 +69,23 @@ test.describe('tap targets are at least 44px', () => {
 });
 
 test.describe('motion', () => {
-  test('sections fade in once, unless reduced motion is requested', async ({ page }) => {
+  test('sections fade in and colours transition, unless reduced motion is requested', async ({ page }) => {
     await visit(page, '');
-    const animation = () => page.locator('main > section').nth(1).evaluate((el) => getComputedStyle(el).animationName);
+    const section = page.locator('main > section').nth(1);
+    const link = page.locator('.site-nav__link').first();
+    const button = page.locator('[data-theme-toggle]');
+    const animation = () => section.evaluate((el) => getComputedStyle(el).animationName);
+    const transition = (locator: typeof link) =>
+      locator.evaluate((el) => getComputedStyle(el).transitionDuration.split(',').map((value) => value.trim()));
+
     expect(await animation()).toBe('reveal');
+    expect(await transition(link)).not.toEqual(['0s']);
+    expect(await transition(button)).not.toEqual(['0s']);
+
     await page.emulateMedia({ reducedMotion: 'reduce' });
     expect(await animation()).toBe('none');
+    for (const locator of [link, button]) {
+      expect((await transition(locator)).every((value) => value === '0s')).toBe(true);
+    }
   });
 });

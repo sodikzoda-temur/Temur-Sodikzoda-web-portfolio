@@ -1,0 +1,80 @@
+---
+import { DEGREE_IDS, TRAINING_IDS } from '../../data/types';
+import { joinParts } from '../../lib/format';
+import { getProfile, type Locale } from '../../lib/i18n';
+import Text from '../Text.astro';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = getProfile(lang);
+const { degrees, training } = t.education;
+---
+
+<div class="education">
+  <div class="education__group">
+    <h3 class="subhead">{t.education.degreesLabel}</h3>
+    <ol class="rule-list" role="list">
+      {
+        DEGREE_IDS.map((id) => {
+          const degree = degrees[id];
+          return (
+            <li class="entry" data-item={id}>
+              <p class="entry__aside">{degree.period}</p>
+              <div class="entry__main measure">
+                <h4 class="item-title">{joinParts(degree.degree, degree.field)}</h4>
+                <p class="education__school">{joinParts(degree.institution, degree.place)}</p>
+                <ul class="points education__details">
+                  {degree.details.map((detail) => (
+                    <li>{detail}</li>
+                  ))}
+                </ul>
+              </div>
+            </li>
+          );
+        })
+      }
+    </ol>
+  </div>
+
+  <div class="education__group">
+    <h3 class="subhead">{t.education.trainingLabel}</h3>
+    <ol class="rule-list rule-list--compact" role="list">
+      {
+        TRAINING_IDS.map((id) => {
+          const course = training[id];
+          return (
+            <li class="entry entry--short" data-item={id}>
+              <p class="entry__aside">{course.year}</p>
+              <div class="entry__main measure">
+                <p class="education__course">
+                  <Text value={course.title} />
+                </p>
+                <p class="muted">{joinParts(course.provider, course.place)}</p>
+              </div>
+            </li>
+          );
+        })
+      }
+    </ol>
+  </div>
+</div>
+
+<style>
+  .education {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-xl);
+  }
+
+  .education__school,
+  .education__course {
+    font-weight: 500;
+  }
+
+  .education__details {
+    margin-block-start: var(--space-xs);
+  }
+</style>

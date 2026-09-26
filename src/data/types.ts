@@ -1,14 +1,41 @@
 /**
- * Shape of the site content. `en.ts` and `ru.ts` must both satisfy `Profile`,
- * so a field missing in either language fails `astro check`.
+ * Shape of the site content. `en.ts` satisfies `Profile`; `ru.ts` satisfies
+ * `Profile` and the shape of `en.ts` (see `ShapeOf`), so an entry, a bullet or
+ * an optional field that exists in only one language fails `astro check`.
  *
- * Lists whose entries must exist in both languages are keyed records: the
- * `*_IDS` arrays below fix the keys and the display order. To add an entry,
- * add its id here, then add the entry to both language files.
+ * Lists of entries are keyed records: the `*_IDS` arrays below fix the keys
+ * and the display order. To add an entry, add its id here, then add the entry
+ * to both language files.
  */
 
 export const LOCALES = ['en', 'ru'] as const;
 export type Locale = (typeof LOCALES)[number];
+
+/** A phrase in another language inside a text, e.g. an English term on a Russian page. */
+export interface Foreign {
+  readonly lang: Locale;
+  readonly text: string;
+}
+
+/** Text with phrases in another language; write it with `rich()` from `markup.ts`. */
+export interface RichText {
+  readonly parts: readonly (string | Foreign)[];
+}
+
+/** Plain text, or text with marked phrases in another language. */
+export type Text = string | RichText;
+
+/**
+ * The shape of the English content with every text widened to `Text`: the same
+ * keys, the same optional fields and the same list lengths.
+ */
+export type ShapeOf<T> = T extends string | RichText
+  ? Text
+  : T extends boolean
+    ? boolean
+    : T extends number
+      ? number
+      : { readonly [K in keyof T]: ShapeOf<T[K]> };
 
 /** Home page sections, in page order (the hero comes first and has no id). */
 export const SECTION_IDS = [
@@ -57,19 +84,21 @@ export interface Hero {
 
 export interface FocusArea {
   title: string;
-  text: string;
+  text: Text;
   /** Marks a research interest rather than completed work. */
   interest?: boolean;
 }
 
 export interface WorkItem {
-  title: string;
+  title: Text;
   /** Organisation or institutions; omit when the source gives none. */
   org?: string;
-  /** Period as displayed; omit when the source gives none. */
+  /** Period as displayed; omit when the source gives none (nothing is rendered). */
   period?: string;
-  /** Short facts such as funding and partners. */
-  meta?: Lines;
+  /** Funding note, shown as a tag. */
+  funding?: string;
+  /** Partners line, including its lead-in word ("Partners: …"). */
+  partners?: string;
   points: Lines;
 }
 
@@ -93,9 +122,8 @@ export interface Degree {
 
 export interface TrainingItem {
   year: string;
-  title: string;
-  /** Set when the title keeps its original language. */
-  titleLang?: Locale;
+  /** A title kept in its original language is marked with `rich()`. */
+  title: Text;
   provider: string;
   place?: string;
 }
@@ -144,7 +172,7 @@ export interface Profile {
   };
   affiliations: {
     membershipsLabel: string;
-    memberships: Keyed<typeof MEMBERSHIP_IDS, string>;
+    memberships: Keyed<typeof MEMBERSHIP_IDS, Text>;
     eventsLabel: string;
     events: Keyed<typeof EVENT_IDS, string>;
   };

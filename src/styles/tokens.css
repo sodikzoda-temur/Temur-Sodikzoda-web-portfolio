@@ -36,6 +36,10 @@
   --step-4: clamp(1.875rem, 1.386rem + 2.174vw, 3.125rem);
   --step-5: clamp(2.75rem, 1.478rem + 5.652vw, 6rem);
 
+  /* Small labels and item titles; capped on very narrow layouts (see below) */
+  --size-label: var(--step--1);
+  --size-title: var(--step-1);
+
   /* Spacing */
   --space-3xs: 0.25rem;
   --space-2xs: 0.5rem;
@@ -89,4 +93,18 @@
   --tint: #15271e;
   --focus-edge: var(--bg);
   --glow: rgb(61 178 122 / 0.1);
+}
+
+/*
+ * Narrow in text terms (a small phone with large text, or high zoom): labels,
+ * tags and item titles are capped by the viewport width, so the longest Russian
+ * words fit without relying on hyphenation.
+ */
+@media (width < 22em) {
+  :root {
+    --size-label: min(var(--step--1), 4.5vw);
+    --size-title: min(var(--step-1), 7vw);
+    /* Side margins follow the screen, not the enlarged text */
+    --gutter: min(1rem, 5vw);
+  }
 }

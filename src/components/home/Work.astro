@@ -1,0 +1,74 @@
+---
+import { WORK_IDS } from '../../data/types';
+import { getProfile, type Locale } from '../../lib/i18n';
+import Text from '../Text.astro';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = getProfile(lang);
+---
+
+<ul class="work" role="list">
+  {
+    WORK_IDS.map((id) => {
+      const item = t.work[id];
+      return (
+        <li class="work__item" data-item={id}>
+          <h3 class="item-title">
+            <Text value={item.title} />
+          </h3>
+          {item.org && <p class="work__org">{item.org}</p>}
+          {(item.period || item.funding) && (
+            <ul class="tags work__tags" role="list">
+              {item.period && <li class="tag">{item.period}</li>}
+              {item.funding && <li class="tag">{item.funding}</li>}
+            </ul>
+          )}
+          {item.partners && <p class="work__partners muted">{item.partners}</p>}
+          <ul class="points work__points">
+            {item.points.map((point) => (
+              <li>{point}</li>
+            ))}
+          </ul>
+        </li>
+      );
+    })
+  }
+</ul>
+
+<style>
+  .work {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-xl) var(--grid-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .work__item {
+    padding-block-start: var(--space-s);
+    border-top: var(--rule);
+  }
+
+  .work__item > * + * {
+    margin-block-start: var(--space-xs);
+  }
+
+  .work__org {
+    font-weight: 500;
+  }
+
+  .work__points {
+    margin-block-start: var(--space-s);
+  }
+
+  @media (width >= 48em) {
+    .work {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

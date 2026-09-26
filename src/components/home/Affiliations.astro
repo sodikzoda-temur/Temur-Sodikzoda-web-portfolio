@@ -1,0 +1,44 @@
+---
+import { EVENT_IDS, MEMBERSHIP_IDS } from '../../data/types';
+import { getProfile, type Locale } from '../../lib/i18n';
+import Text from '../Text.astro';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = getProfile(lang);
+const { memberships, events } = t.affiliations;
+---
+
+<div class="pair">
+  <div>
+    <h3 class="subhead">{t.affiliations.membershipsLabel}</h3>
+    <ul class="rule-list affiliations__list" role="list">
+      {
+        MEMBERSHIP_IDS.map((id) => (
+          <li data-item={id}>
+            <Text value={memberships[id]} />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+  <div>
+    <h3 class="subhead">{t.affiliations.eventsLabel}</h3>
+    <ul class="rule-list affiliations__list" role="list">
+      {EVENT_IDS.map((id) => <li data-item={id}>{events[id]}</li>)}
+    </ul>
+  </div>
+</div>
+
+<style>
+  .affiliations__list > li {
+    padding-block: var(--space-xs);
+  }
+
+  .affiliations__list > li:first-child {
+    padding-block-start: 0;
+  }
+</style>

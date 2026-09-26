@@ -1,7 +1,10 @@
+import type en from './en';
+import { inEnglish, rich } from './markup';
 import { SHOW_AVAILABILITY } from './shared';
-import type { Profile } from './types';
+import type { Profile, ShapeOf } from './types';
 
-export default {
+// Same keys, optional fields and list lengths as en.ts, checked by ShapeOf.
+const ru = {
   meta: {
     home: {
       title: 'Темур Содикзода · Инженер в сфере санитарии',
@@ -21,7 +24,7 @@ export default {
     menu: 'Меню',
     themeToggle: 'Тёмная тема',
     languageLabel: 'Язык',
-    researchInterest: 'Направление интересов',
+    researchInterest: 'Научный интерес',
     portraitAlt: 'Темур Содикзода',
   },
 
@@ -66,7 +69,11 @@ export default {
     },
     decentralised: {
       title: 'Децентрализованная очистка и мониторинг',
-      text: 'Эффективность систем DEWATS и ветландов (constructed wetlands); лабораторные методы и оценка соответствия таджикским нормативам, нормам ЕС и рекомендациям ВОЗ.',
+      text: rich(
+        'Эффективность систем DEWATS и ветландов (',
+        inEnglish('constructed wetlands'),
+        '); лабораторные методы и оценка соответствия таджикским нормативам, нормам ЕС и рекомендациям ВОЗ.',
+      ),
     },
     recovery: {
       title: 'Извлечение энергии и ресурсов',
@@ -80,12 +87,11 @@ export default {
       title: 'Исследовательский компонент проекта CoWaSS',
       org: 'ISW',
       period: 'с 2022 года по настоящее время',
-      meta: [
-        'Финансирование: SDC',
+      funding: 'Финансирование: SDC',
+      partners:
         'Партнёры: Helvetas, Университет прикладных наук и искусств Северо-Западной Швейцарии (FHNW), Университет Тренто, BORDA Таджикистан',
-      ],
       points: [
-        'Координировал исследовательский компонент фазы 1 (фаза длилась с 2021 года по февраль 2026 года, я участвовал в ней с октября 2022 года) по 4 направлениям: лабораторная инфраструктура и аккредитация, международное академическое сотрудничество, мониторинг и оценка систем DEWATS, обмен знаниями.',
+        'Координировал исследовательский компонент фазы 1 (фаза длилась с 2021 года по февраль 2026 года; я выполнял эту роль с октября 2022 года) по 4 направлениям: лабораторная инфраструктура и аккредитация, международное академическое сотрудничество, мониторинг и оценка систем DEWATS, обмен знаниями.',
         'Подготовил итоговый отчёт по исследовательскому компоненту фазы 1.',
         'Сейчас руковожу научным компонентом и партнёрством с университетами.',
       ],
@@ -101,7 +107,7 @@ export default {
       ],
     },
     wetland: {
-      title: 'Мониторинг ветланда (constructed wetland), больница Дехмой',
+      title: rich('Мониторинг ветланда (', inEnglish('constructed wetland'), '), больница Дехмой'),
       points: [
         'Программа мониторинга с участием лабораторий 2 университетов-партнёров.',
         'Разработал инструмент отчётности на основе электронных таблиц, который формирует двуязычные заключения о соответствии таджикским нормативам, нормам ЕС и рекомендациям ВОЗ.',
@@ -173,8 +179,8 @@ export default {
     degreesLabel: 'Высшее образование',
     degrees: {
       msc: {
-        degree: 'Магистр, диплом с отличием',
-        field: 'Теплоэнергетика и теплотехника',
+        degree: 'Магистр (диплом с отличием)',
+        field: 'теплоэнергетика и теплотехника',
         institution: 'Вятский государственный университет (ВятГУ)',
         place: 'Киров, Россия',
         period: 'с 2019 по 2021 год',
@@ -185,7 +191,7 @@ export default {
       },
       bsc: {
         degree: 'Бакалавр',
-        field: 'Теплоэнергетика и теплотехника',
+        field: 'теплоэнергетика и теплотехника',
         institution: 'Вятский государственный университет (ВятГУ)',
         place: 'Киров, Россия',
         period: 'с 2015 по 2019 год',
@@ -200,14 +206,12 @@ export default {
     training: {
       tsinghua: {
         year: '2024',
-        title: 'Water and Wastewater Treatment Engineering: Biochemical Technology',
-        titleLang: 'en',
+        title: rich(inEnglish('Water and Wastewater Treatment Engineering: Biochemical Technology')),
         provider: 'Университет Цинхуа, Coursera',
       },
       mitx: {
         year: '2024',
-        title: '7.00x Introduction to Biology: The Secret of Life',
-        titleLang: 'en',
+        title: rich(inEnglish('7.00x Introduction to Biology: The Secret of Life')),
         provider: 'MITx, подтверждённый сертификат',
       },
       borda: {
@@ -236,7 +240,7 @@ export default {
     memberships: {
       wypw: 'Всемирный молодёжный парламент за воду (WYPW)',
       cay4w: 'Сеть «Молодёжь Центральной Азии за воду» (CAY4W)',
-      cop4wash: 'Cooperation of Practices for WASH (CoP4WASH)',
+      cop4wash: rich(inEnglish('Cooperation of Practices for WASH (CoP4WASH)')),
     },
     eventsLabel: 'Мероприятия',
     events: {
@@ -252,7 +256,7 @@ export default {
     languages: {
       tajik: { name: 'Таджикский', level: 'родной' },
       russian: { name: 'Русский', level: 'родной' },
-      english: { name: 'Английский', level: 'профессиональное рабочее владение' },
+      english: { name: 'Английский', level: 'профессиональный рабочий уровень' },
       german: { name: 'Немецкий', level: 'базовый' },
     },
     toolsLabel: 'Инструменты',
@@ -290,4 +294,6 @@ export default {
   footer: {
     copyright: 'Темур Содикзода',
   },
-} satisfies Profile;
+} satisfies ShapeOf<typeof en>;
+
+export default ru satisfies Profile;

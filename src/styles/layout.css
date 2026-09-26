@@ -23,7 +23,7 @@
 /* Small monospace caps, used for section labels and quiet metadata */
 .label {
   font-family: var(--font-mono);
-  font-size: var(--step--1);
+  font-size: var(--size-label);
   font-weight: 500;
   line-height: 1.5;
   letter-spacing: 0.08em;
@@ -55,6 +55,10 @@
   color: var(--brand);
 }
 
+.section__label > :last-child {
+  min-width: 0;
+}
+
 @media (width >= 64em) {
   .section__label {
     grid-column: 1 / span 3;
@@ -62,6 +66,21 @@
 
   .section__body {
     grid-column: 4 / -1;
+  }
+}
+
+/*
+ * Narrow in text terms (small phone, large text or high zoom): tighter labels.
+ * Label, tag and title sizes are also capped there (see tokens.css), so long
+ * Russian words fit without hyphenation.
+ */
+@media (width < 22em) {
+  .label {
+    letter-spacing: 0.04em;
+  }
+
+  .section__label {
+    column-gap: 0.6em;
   }
 }
 
@@ -90,6 +109,7 @@
   top: var(--space-2xs);
   left: var(--gutter);
   z-index: 100;
+  max-width: calc(100% - 2 * var(--gutter));
   display: inline-flex;
   align-items: center;
   min-height: var(--tap);

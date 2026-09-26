@@ -1,0 +1,144 @@
+/* Content patterns for the home page sections (and later the CV) */
+
+/* Tags: small highlights on --tint, e.g. a period or a funder */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tag {
+  display: inline-block;
+  max-width: 100%;
+  padding: 0.25em 0.6em;
+  border-radius: 4px;
+  background: var(--tint);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--size-label);
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: 0.02em;
+  overflow-wrap: anywhere;
+  -webkit-hyphens: manual;
+  hyphens: manual;
+}
+
+/* Heading of a group inside a section, e.g. "Degrees" or "Events" */
+.subhead {
+  margin-block-end: var(--space-s);
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+/* Title of an item: a project, a role, a degree */
+.item-title {
+  font-family: var(--font-serif);
+  font-size: var(--size-title);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+/* Items separated by thin rules */
+/* Grids here and below use minmax(0, 1fr) so long words never widen the page */
+.rule-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rule-list > li {
+  padding-block: var(--space-m);
+  border-top: var(--rule);
+}
+
+.rule-list > li:first-child {
+  padding-block-start: 0;
+  border-top: 0;
+}
+
+.rule-list--compact > li {
+  padding-block: var(--space-s);
+}
+
+/* An entry with a short aside (period or year) beside it on wider screens */
+.entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-3xs) var(--grid-gap);
+}
+
+.entry__aside {
+  font-family: var(--font-mono);
+  font-size: var(--size-label);
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  -webkit-hyphens: manual;
+  hyphens: manual;
+}
+
+.entry__main > * + * {
+  margin-block-start: var(--space-3xs);
+}
+
+@media (width >= 48em) {
+  .entry {
+    grid-template-columns: 11rem minmax(0, 1fr);
+  }
+
+  .entry--short {
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+  }
+
+  .entry__aside {
+    padding-block-start: 0.2em;
+  }
+}
+
+/* Bullet points with a small accent marker */
+.points {
+  margin: 0;
+  padding-inline-start: 1.1em;
+  list-style-type: disc;
+}
+
+.points > li + li {
+  margin-block-start: var(--space-2xs);
+}
+
+.points > li::marker {
+  color: var(--accent);
+}
+
+/* Two groups side by side from 768px */
+.pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-xl) var(--grid-gap);
+}
+
+@media (width >= 48em) {
+  .pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Readable line length for running text */
+.measure {
+  max-width: 44rem;
+}

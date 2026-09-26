@@ -1,0 +1,66 @@
+---
+import { FOCUS_IDS } from '../../data/types';
+import { getProfile, type Locale } from '../../lib/i18n';
+import Text from '../Text.astro';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = getProfile(lang);
+---
+
+<ul class="focus" role="list">
+  {
+    FOCUS_IDS.map((id) => {
+      const area = t.focus[id];
+      return (
+        <li class="focus__item" data-item={id}>
+          <h3 class="focus__title">{area.title}</h3>
+          {area.interest && (
+            <p class="focus__tag">
+              <span class="tag">{t.ui.researchInterest}</span>
+            </p>
+          )}
+          <p>
+            <Text value={area.text} />
+          </p>
+        </li>
+      );
+    })
+  }
+</ul>
+
+<style>
+  .focus {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-l) var(--grid-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .focus__item {
+    padding-block-start: var(--space-s);
+    border-top: var(--rule);
+  }
+
+  .focus__item > * + * {
+    margin-block-start: var(--space-xs);
+  }
+
+  .focus__title {
+    font-size: var(--size-title);
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--brand);
+  }
+
+  @media (width >= 64em) {
+    .focus {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

@@ -48,7 +48,7 @@ const t = getProfile(lang);
 <style>
   /* The only gradient on the site: a faint mint glow behind the hero */
   .hero {
-    padding-block: var(--space-3xl) var(--space-2xl);
+    padding-block: var(--space-3xl) var(--space-xl);
     background-image: radial-gradient(ellipse 75% 65% at 20% 35%, var(--glow), transparent 70%);
   }
 
@@ -69,6 +69,7 @@ const t = getProfile(lang);
 
   .hero__lines {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--space-2xs);
     max-width: 40rem;
     margin-block-start: var(--space-l);

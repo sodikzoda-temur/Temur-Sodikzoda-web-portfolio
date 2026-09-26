@@ -1,0 +1,75 @@
+---
+import { LANGUAGE_IDS, TOOL_IDS } from '../../data/types';
+import { getProfile, type Locale } from '../../lib/i18n';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = getProfile(lang);
+const { languages, tools } = t.skills;
+---
+
+<div class="pair">
+  <div>
+    <h3 class="subhead">{t.skills.languagesLabel}</h3>
+    <dl class="skills__languages">
+      {
+        LANGUAGE_IDS.map((id) => (
+          <div class="skills__language" data-item={id}>
+            <dt>{languages[id].name}</dt>
+            <dd class="muted">{languages[id].level}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+  <div>
+    <h3 class="subhead">{t.skills.toolsLabel}</h3>
+    <ul class="tags" role="list">
+      {
+        TOOL_IDS.map((id) => (
+          <li class="tag" data-item={id}>
+            {tools[id]}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</div>
+
+<style>
+  .skills__languages {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    margin: 0;
+  }
+
+  .skills__language {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0 var(--space-s);
+    padding-block: var(--space-xs);
+    border-top: var(--rule);
+  }
+
+  .skills__language:first-child {
+    padding-block-start: 0;
+    border-top: 0;
+  }
+
+  .skills__language dt {
+    font-weight: 500;
+  }
+
+  .skills__language dd {
+    margin: 0;
+  }
+
+  @media (width >= 30em) {
+    .skills__language {
+      grid-template-columns: 9rem minmax(0, 1fr);
+    }
+  }
+</style>

@@ -1,0 +1,25 @@
+---
+import { getProfile, type Locale } from '../../lib/i18n';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = getProfile(lang);
+---
+
+<div class="about measure">
+  {t.about.map((paragraph) => <p>{paragraph}</p>)}
+</div>
+
+<style>
+  .about {
+    font-size: var(--step-1);
+    line-height: 1.6;
+  }
+
+  .about p + p {
+    margin-block-start: 1em;
+  }
+</style>

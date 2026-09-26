@@ -1,0 +1,16 @@
+---
+import type { Text } from '../data/types';
+
+interface Props {
+  value: Text;
+}
+
+// Renders text from the data; phrases in another language get a lang attribute.
+const { value } = Astro.props;
+---
+
+{
+  typeof value === 'string'
+    ? value
+    : value.parts.map((part) => (typeof part === 'string' ? part : <span lang={part.lang}>{part.text}</span>))
+}

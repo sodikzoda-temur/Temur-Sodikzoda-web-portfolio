@@ -2,6 +2,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { expect, test } from '@playwright/test';
 import { SITE } from '../src/config.ts';
+import { EMAIL } from '../src/data/shared.ts';
 
 // Static checks on the build. The Content Security Policy allows only
 // same-origin files, so the markup must not contain inline code or styles.
@@ -40,13 +41,22 @@ test.describe('build output', () => {
     }
   });
 
+  test('never contains the full email address', () => {
+    const address = `${EMAIL.user}@${EMAIL.domain}`;
+    const files = [...htmlFiles(), ...filesEndingWith(DIST, '.js')];
+    expect(files.length).toBeGreaterThan(5);
+    for (const file of files) {
+      expect.soft(readFileSync(file, 'utf8'), relative(DIST, file)).not.toContain(address);
+    }
+  });
+
   test('declares six font faces, Latin and Cyrillic only, all with font-display: swap', () => {
     const css = filesEndingWith(DIST, '.css').map((file) => readFileSync(file, 'utf8')).join('\n');
     const faces = css.match(/@font-face\s*\{[^}]*\}/g) ?? [];
     expect(faces).toHaveLength(6);
     for (const face of faces) {
       expect.soft(face).toMatch(/font-display:\s*swap/);
-      expect.soft(face).toMatch(/-(latin|cyrillic)-[\w-]+\.[\w-]+\.woff2/);
+      expect.soft(face).toMatch(/-(latin|cyrillic)-(wght|500)-normal\.[\w-]+\.woff2/);
     }
   });
 
