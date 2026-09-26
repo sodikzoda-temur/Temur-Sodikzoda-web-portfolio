@@ -1,0 +1,92 @@
+/*
+ * Design tokens. Light theme is the default; dark follows the system unless
+ * the visitor picks a theme, which sets data-theme on <html>.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* Colour, light theme */
+  --bg: #f6f8f4;
+  --surface: #ffffff;
+  --ink: #0f1d16;
+  --muted: #56665c;
+  --line: #dce5dd;
+  --brand: #1d5b43;
+  --brand-deep: #123d2d;
+  --accent: #3db27a;
+  --tint: #e4f2e9;
+
+  /* Accent ring with a dark edge: the edge keeps 3:1 against light backgrounds */
+  --focus-ring: var(--accent);
+  --focus-edge: var(--brand-deep);
+  --glow: rgb(61 178 122 / 0.16);
+
+  /* Typography */
+  --font-serif: 'Source Serif 4 Variable', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  /* Fluid type scale from 360px to 1280px viewports */
+  --step--1: clamp(0.7813rem, 0.757rem + 0.109vw, 0.8438rem);
+  --step-0: clamp(1rem, 0.951rem + 0.217vw, 1.125rem);
+  --step-1: clamp(1.125rem, 1.039rem + 0.38vw, 1.3438rem);
+  --step-2: clamp(1.3125rem, 1.166rem + 0.652vw, 1.6875rem);
+  --step-3: clamp(1.5625rem, 1.294rem + 1.196vw, 2.25rem);
+  --step-4: clamp(1.875rem, 1.386rem + 2.174vw, 3.125rem);
+  --step-5: clamp(2.75rem, 1.478rem + 5.652vw, 6rem);
+
+  /* Spacing */
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-s: 1rem;
+  --space-m: 1.5rem;
+  --space-l: 2rem;
+  --space-xl: clamp(2.5rem, 2.1rem + 1.8vw, 3.5rem);
+  --space-2xl: clamp(3.5rem, 2.7rem + 3.5vw, 6rem);
+  --space-3xl: clamp(4.5rem, 3.3rem + 5.4vw, 8rem);
+
+  /* Layout */
+  --content-max: 70rem;
+  --gutter: clamp(1rem, 0.6rem + 1.8vw, 2rem);
+  --grid-gap: clamp(1rem, 0.7rem + 1.2vw, 1.5rem);
+  --header-h: 4rem;
+  --tap: 2.75rem;
+  --radius: 16px;
+  --rule: 1px solid var(--line);
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* Dark theme: keep both blocks identical. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg: #0b1410;
+    --surface: #111c16;
+    --ink: #e7efe9;
+    --muted: #98ab9f;
+    --line: #20302a;
+    --brand: #7ed0a6;
+    --brand-deep: #a8e3c4;
+    --accent: #3db27a;
+    --tint: #15271e;
+    --focus-edge: var(--bg);
+    --glow: rgb(61 178 122 / 0.1);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0b1410;
+  --surface: #111c16;
+  --ink: #e7efe9;
+  --muted: #98ab9f;
+  --line: #20302a;
+  --brand: #7ed0a6;
+  --brand-deep: #a8e3c4;
+  --accent: #3db27a;
+  --tint: #15271e;
+  --focus-edge: var(--bg);
+  --glow: rgb(61 178 122 / 0.1);
+}

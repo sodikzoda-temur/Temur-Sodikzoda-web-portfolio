@@ -1,0 +1,216 @@
+---
+import LanguageSwitch from './LanguageSwitch.astro';
+import ThemeToggle from './ThemeToggle.astro';
+import { NAV_IDS } from '../data/types';
+import { getProfile, pageUrl, sectionUrl, type Locale, type PageKey } from '../lib/i18n';
+
+interface Props {
+  lang: Locale;
+  page: PageKey;
+}
+
+const { lang, page } = Astro.props;
+const t = getProfile(lang);
+const home = pageUrl(lang, 'home');
+---
+
+<a class="skip-link" href="#main">{t.ui.skipLink}</a>
+
+<header class="site-header" data-site-header>
+  <div class="container site-header__bar">
+    <a class="site-header__brand" href={home} aria-current={page === 'home' ? 'page' : undefined}>
+      {t.hero.name}
+    </a>
+
+    <button class="site-header__toggle" type="button" aria-expanded="false" aria-controls="site-menu" data-menu-toggle>
+      {t.ui.menu}
+    </button>
+
+    <div class="site-header__menu" id="site-menu" data-menu>
+      <nav aria-label={t.ui.navLabel}>
+        <ul class="site-nav" role="list">
+          {
+            NAV_IDS.map((id) => (
+              <li>
+                <a class="site-nav__link" href={sectionUrl(lang, id)}>
+                  {t.nav[id]}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <LanguageSwitch lang={lang} page={page} />
+    </div>
+
+    <ThemeToggle label={t.ui.themeToggle} />
+  </div>
+</header>
+
+<script>
+  import { initMenu } from '../scripts/menu';
+
+  initMenu();
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--bg);
+    border-bottom: var(--rule);
+  }
+
+  /* With large text the controls wrap below the name instead of overflowing */
+  .site-header__bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-2xs);
+    min-height: var(--header-h);
+  }
+
+  /* Very narrow in text terms (small phone, large text or high zoom): let the header scroll away */
+  @media (width < 22em) {
+    .site-header {
+      position: relative;
+    }
+  }
+
+  .site-header__brand {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    margin-inline-end: auto;
+    font-family: var(--font-serif);
+    font-size: var(--step-1);
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--ink);
+    text-decoration: none;
+    -webkit-hyphens: manual;
+    hyphens: manual;
+  }
+
+  .site-header__brand:hover {
+    color: var(--brand);
+  }
+
+  .site-header__toggle {
+    display: none;
+  }
+
+  .site-nav {
+    display: flex;
+    padding: 0;
+    list-style: none;
+  }
+
+  .site-nav__link {
+    display: flex;
+    align-items: center;
+    min-height: var(--tap);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--ink);
+    text-decoration: none;
+    -webkit-hyphens: manual;
+    hyphens: manual;
+  }
+
+  .site-nav__link:hover {
+    color: var(--brand);
+    text-decoration-line: underline;
+    text-decoration-color: var(--accent);
+  }
+
+  /*
+   * Menu button below 1024px: the Russian navigation needs about 790px and
+   * would wrap the name at tablet widths. The page grid still switches at 768px.
+   */
+  @media (width < 64em) {
+    .site-header__menu {
+      flex-basis: 100%;
+      padding-block-end: var(--space-xs);
+    }
+
+    .site-nav {
+      flex-direction: column;
+    }
+
+    .site-nav__link {
+      min-height: 3rem;
+      border-bottom: var(--rule);
+    }
+
+    /* Without JavaScript the header is not sticky and the links sit below the name */
+    :global(html:not(.js)) .site-header {
+      position: static;
+    }
+
+    /* With JavaScript the links move into a panel opened by the menu button */
+    :global(.js) .site-header__toggle {
+      display: inline-flex;
+      align-items: center;
+      min-height: var(--tap);
+      padding-inline: var(--space-s);
+      border: var(--rule);
+      border-radius: 999px;
+      background: var(--surface);
+      font-size: 0.9375rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    :global(.js) .site-header__toggle:hover {
+      color: var(--brand);
+    }
+
+    :global(.js) .site-header__toggle[aria-expanded='true'] {
+      background: var(--tint);
+      border-color: var(--tint);
+    }
+
+    :global(.js) .site-header__menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      left: 0;
+      max-height: calc(100dvh - var(--header-h));
+      overflow-y: auto;
+      padding: var(--space-2xs) var(--gutter) var(--space-s);
+      background: var(--bg);
+      border-bottom: var(--rule);
+    }
+
+    :global(.js) .site-header[data-menu-open] .site-header__menu {
+      display: block;
+    }
+  }
+
+  /* Wide screens: links, language switch and theme toggle in one row */
+  @media (width >= 64em) {
+    .site-header__bar {
+      gap: var(--space-s);
+    }
+
+    .site-header__menu {
+      display: flex;
+      align-items: center;
+      gap: var(--space-s);
+    }
+
+    .site-nav {
+      gap: clamp(0.75rem, 0.2rem + 1.2vw, 1.75rem);
+    }
+
+    .site-nav__link {
+      justify-content: center;
+      min-width: var(--tap);
+      padding-inline: 0.25rem;
+    }
+  }
+</style>

@@ -1,0 +1,104 @@
+---
+import { LANGUAGE_NAMES } from '../data/shared';
+import { getProfile, LOCALES, pageUrl, type Locale, type PageKey } from '../lib/i18n';
+
+interface Props {
+  lang: Locale;
+  page: PageKey;
+}
+
+const { lang, page } = Astro.props;
+const t = getProfile(lang);
+---
+
+<nav class="lang-switch" aria-label={t.ui.languageLabel}>
+  <ul class="lang-switch__list" role="list">
+    {
+      LOCALES.map((code, index) => (
+        <li class="lang-switch__item">
+          {index > 0 && (
+            <span class="lang-switch__sep" aria-hidden="true">
+              /
+            </span>
+          )}
+          <a
+            class="lang-switch__link"
+            href={pageUrl(code, page)}
+            hreflang={code}
+            aria-current={code === lang ? 'page' : undefined}
+          >
+            {code.toUpperCase()}
+            <span class="lang-switch__name visually-hidden" lang={code}>{` ${LANGUAGE_NAMES[code]}`}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<style>
+  .lang-switch__list {
+    display: flex;
+    align-items: center;
+    padding: 0;
+    list-style: none;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+  }
+
+  .lang-switch__item {
+    display: flex;
+    align-items: center;
+  }
+
+  .lang-switch__sep {
+    padding-inline: 0.25em;
+    color: var(--muted);
+  }
+
+  .lang-switch__link {
+    display: inline-grid;
+    place-items: center;
+    min-width: var(--tap);
+    min-height: var(--tap);
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  /*
+   * The spoken names ("English", "Русский") are visually hidden. A system font
+   * keeps English pages from downloading the Cyrillic web font files for them.
+   */
+  .lang-switch__name {
+    font-family: sans-serif;
+  }
+
+  .lang-switch__link:hover {
+    color: var(--brand);
+  }
+
+  .lang-switch__link[aria-current='page'] {
+    color: var(--ink);
+    text-decoration-line: underline;
+    text-decoration-color: var(--accent);
+    text-underline-offset: 0.35em;
+  }
+
+  /*
+   * Small-screen menu panel: the codes start at the same edge as the links
+   * above, inside their 44px targets. The separator takes the space left in
+   * the first target (44px minus the two letters, 1.36em) so "EN / RU" stays
+   * evenly spaced.
+   */
+  @media (width < 64em) {
+    .lang-switch__link {
+      justify-items: start;
+    }
+
+    .lang-switch__sep {
+      padding-inline-end: calc(var(--tap) - 1.36em + 0.25em);
+    }
+  }
+</style>

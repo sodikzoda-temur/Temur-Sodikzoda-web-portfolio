@@ -1,0 +1,136 @@
+/* Layout primitives and shared patterns */
+
+.container {
+  width: 100%;
+  max-width: calc(var(--content-max) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Single column on small screens, 12 columns from 768px */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-m) var(--grid-gap);
+}
+
+@media (width >= 48em) {
+  .grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+}
+
+/* Small monospace caps, used for section labels and quiet metadata */
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  -webkit-hyphens: manual;
+  hyphens: manual;
+}
+
+/* Page sections: a numbered label beside the content on wide screens */
+.section {
+  padding-block: var(--space-2xl);
+  border-top: var(--rule);
+}
+
+.section__label,
+.section__body {
+  grid-column: 1 / -1;
+}
+
+/* Number and text side by side, so a long label wraps under its text */
+.section__label {
+  display: flex;
+  column-gap: 0.9em;
+}
+
+.section__num {
+  flex: none;
+  color: var(--brand);
+}
+
+@media (width >= 64em) {
+  .section__label {
+    grid-column: 1 / span 3;
+  }
+
+  .section__body {
+    grid-column: 4 / -1;
+  }
+}
+
+/* Standalone links get a full tap target */
+.tap-link {
+  display: inline-flex;
+  align-items: center;
+  min-width: var(--tap);
+  min-height: var(--tap);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.skip-link {
+  position: absolute;
+  top: var(--space-2xs);
+  left: var(--gutter);
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding-inline: var(--space-s);
+  background: var(--surface);
+  border: var(--rule);
+  border-radius: 8px;
+  translate: 0 -200%;
+}
+
+.skip-link:focus {
+  translate: none;
+}
+
+/*
+ * Sections fade in once on load. CSS only, so content never depends on
+ * JavaScript; the from-state applies only while the animation runs.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    animation: reveal 700ms var(--ease) backwards;
+  }
+
+  .reveal:nth-child(2) {
+    animation-delay: 80ms;
+  }
+
+  .reveal:nth-child(n + 3) {
+    animation-delay: 160ms;
+  }
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    translate: 0 0.75rem;
+  }
+}
+
+@media print {
+  .reveal {
+    animation: none;
+  }
+}
