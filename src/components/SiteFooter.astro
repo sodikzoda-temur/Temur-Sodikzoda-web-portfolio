@@ -1,0 +1,43 @@
+---
+import { getProfile, type Locale } from '../lib/i18n';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = getProfile(lang);
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <svg class="site-footer__curve" viewBox="0 0 1200 48" preserveAspectRatio="none" aria-hidden="true">
+    <path
+      d="M0 34C160 34 250 12 420 12S700 40 880 36 1100 14 1200 18"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1"
+      vector-effect="non-scaling-stroke"></path>
+  </svg>
+  <div class="container site-footer__inner">
+    <p class="site-footer__copy">© {year} {t.footer.copyright}</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    padding-block-end: var(--space-l);
+    color: var(--muted);
+    font-size: 0.9375rem;
+  }
+
+  .site-footer__curve {
+    width: 100%;
+    height: 3rem;
+    color: var(--line);
+  }
+
+  .site-footer__inner {
+    padding-block-start: var(--space-m);
+  }
+</style>

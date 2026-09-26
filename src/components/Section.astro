@@ -1,0 +1,30 @@
+---
+import type { SectionId } from '../data/types';
+import { getProfile, sectionNumber, type Locale } from '../lib/i18n';
+
+interface Props {
+  id: SectionId;
+  lang: Locale;
+  /** Show the two-digit number before the label (home page). */
+  numbered?: boolean;
+}
+
+const { id, lang, numbered = true } = Astro.props;
+const label = getProfile(lang).sections[id];
+const number = numbered ? sectionNumber(id) : undefined;
+// About opens the page without a visible label; its heading stays for screen readers.
+const hiddenLabel = numbered && number === undefined;
+---
+
+<section id={id} class="section reveal" aria-labelledby={`${id}-label`}>
+  <div class="container grid">
+    <h2 id={`${id}-label`} class:list={['section__label', 'label', { 'visually-hidden': hiddenLabel }]}>
+      {/* The number is visual ordering only; headings are announced by name. */}
+      {number && <span class="section__num" aria-hidden="true">{number}</span>}
+      <span>{label}</span>
+    </h2>
+    <div class="section__body">
+      <slot />
+    </div>
+  </div>
+</section>

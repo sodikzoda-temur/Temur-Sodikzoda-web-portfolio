@@ -1,0 +1,76 @@
+---
+import SiteFooter from '../components/SiteFooter.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getProfile, pageUrl } from '../lib/i18n';
+
+// One page for both languages: English first, Russian second.
+const en = getProfile('en');
+const ru = getProfile('ru');
+---
+
+<BaseLayout
+  lang="en"
+  title={`${en.notFound.title} · ${ru.notFound.title}`}
+  description={`${en.notFound.text} ${ru.notFound.text}`}
+  noindex
+>
+  <main id="main" class="not-found">
+    <div class="container reveal">
+      <p class="label">404</p>
+      <h1 class="not-found__title">
+        <span class="not-found__line">{en.notFound.title}</span>
+        <span class="not-found__line not-found__line--second" lang="ru">{ru.notFound.title}</span>
+      </h1>
+      <div class="grid not-found__grid">
+        <div class="not-found__block">
+          <p>{en.notFound.text}</p>
+          <p><a class="tap-link" href={pageUrl('en', 'home')}>{en.notFound.homeLink}</a></p>
+        </div>
+        <div class="not-found__block" lang="ru">
+          <p>{ru.notFound.text}</p>
+          <p><a class="tap-link" href={pageUrl('ru', 'home')}>{ru.notFound.homeLink}</a></p>
+        </div>
+      </div>
+    </div>
+  </main>
+  <SiteFooter lang="en" />
+</BaseLayout>
+
+<style>
+  .not-found {
+    padding-block: var(--space-3xl) var(--space-2xl);
+  }
+
+  .not-found__title {
+    margin-block-start: var(--space-xs);
+    font-size: min(var(--step-4), 11vw);
+    overflow-wrap: normal;
+    line-height: 1.1;
+  }
+
+  .not-found__line {
+    display: block;
+  }
+
+  .not-found__line--second {
+    color: var(--muted);
+  }
+
+  .not-found__grid {
+    margin-block-start: var(--space-xl);
+  }
+
+  .not-found__block {
+    grid-column: 1 / -1;
+  }
+
+  .not-found__block p + p {
+    margin-block-start: var(--space-2xs);
+  }
+
+  @media (width >= 48em) {
+    .not-found__block {
+      grid-column: span 6;
+    }
+  }
+</style>

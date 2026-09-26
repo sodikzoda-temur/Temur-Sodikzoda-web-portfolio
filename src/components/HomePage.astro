@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from './Hero.astro';
+import Section from './Section.astro';
+import SiteFooter from './SiteFooter.astro';
+import SiteHeader from './SiteHeader.astro';
+import { SECTION_IDS } from '../data/types';
+import { getProfile, type Locale } from '../lib/i18n';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = getProfile(lang);
+---
+
+<BaseLayout lang={lang} page="home" title={t.meta.home.title} description={t.meta.home.description}>
+  <SiteHeader lang={lang} page="home" />
+  <main id="main">
+    <Hero lang={lang} />
+    {SECTION_IDS.map((id) => <Section id={id} lang={lang} />)}
+  </main>
+  <SiteFooter lang={lang} />
+</BaseLayout>

@@ -1,0 +1,113 @@
+---
+import { Image } from 'astro:assets';
+import { getProfile, pageUrl, sectionUrl, type Locale } from '../lib/i18n';
+import { portrait } from '../lib/portrait';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = getProfile(lang);
+---
+
+<section class="hero reveal" aria-labelledby="hero-name">
+  <div class="container grid">
+    <div class:list={['hero__text', { 'hero__text--beside': portrait }]}>
+      <h1 id="hero-name" class="hero__name">{t.hero.name}</h1>
+      <div class="hero__lines">
+        {t.hero.lines.map((line) => <p>{line}</p>)}
+      </div>
+      <p class="hero__location label">{t.hero.location}</p>
+      <p class="hero__links">
+        <a class="tap-link" href={sectionUrl(lang, 'focus')}>{t.hero.links.research}</a>
+        <a class="tap-link" href={pageUrl(lang, 'cv')}>{t.hero.links.cv}</a>
+      </p>
+    </div>
+    {
+      portrait && (
+        <div class="hero__portrait">
+          <Image
+            class="hero__image"
+            src={portrait}
+            alt={t.ui.portraitAlt}
+            width={480}
+            height={480}
+            densities={[1, 2]}
+            fit="cover"
+            position="top"
+            format="webp"
+            priority
+          />
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  /* The only gradient on the site: a faint mint glow behind the hero */
+  .hero {
+    padding-block: var(--space-3xl) var(--space-2xl);
+    background-image: radial-gradient(ellipse 75% 65% at 20% 35%, var(--glow), transparent 70%);
+  }
+
+  .hero__text,
+  .hero__portrait {
+    grid-column: 1 / -1;
+    align-self: center;
+  }
+
+  /* Capped by the viewport so large text settings never split the name mid-word */
+  .hero__name {
+    font-size: min(var(--step-5), 13vw);
+    font-weight: 500;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    overflow-wrap: normal;
+  }
+
+  .hero__lines {
+    display: grid;
+    gap: var(--space-2xs);
+    max-width: 40rem;
+    margin-block-start: var(--space-l);
+    font-size: var(--step-1);
+    line-height: 1.5;
+  }
+
+  .hero__location {
+    margin-block-start: var(--space-m);
+  }
+
+  .hero__links {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--space-l);
+    margin-block-start: var(--space-s);
+  }
+
+  .hero__image {
+    width: 100%;
+    max-width: 16rem;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: var(--radius);
+  }
+
+  @media (width >= 64em) {
+    .hero__text--beside {
+      grid-column: 1 / span 8;
+    }
+
+    .hero__portrait {
+      grid-column: 9 / -1;
+      justify-self: end;
+    }
+
+    .hero__image {
+      max-width: 22rem;
+    }
+  }
+</style>

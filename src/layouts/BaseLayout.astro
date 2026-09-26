@@ -1,0 +1,66 @@
+---
+import '../styles/global.css';
+import interLatin from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import interCyrillic from '@fontsource-variable/inter/files/inter-cyrillic-wght-normal.woff2?url';
+import { absolutePageUrl, HTML_LANG, LOCALES, publicUrl, type Locale, type PageKey } from '../lib/i18n';
+
+interface Props {
+  lang: Locale;
+  title: string;
+  description: string;
+  /** Page that exists in both languages; drives canonical and hreflang links. */
+  page?: PageKey;
+  noindex?: boolean;
+}
+
+const { lang, title, description, page, noindex = false } = Astro.props;
+
+// GitHub Pages cannot send headers, so the policy is delivered as a meta tag.
+// Only in the build: the dev server injects inline styles for hot reloading.
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self'",
+  "style-src 'self'",
+  "img-src 'self' data:",
+  "font-src 'self'",
+  "connect-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'none'",
+  'upgrade-insecure-requests',
+].join('; ');
+
+// Pages without a language twin (the 404 page) point at the home pages.
+const alternatesFor = page ?? 'home';
+const alternates = [
+  ...LOCALES.map((code) => ({ hreflang: code, href: absolutePageUrl(code, alternatesFor) })),
+  { hreflang: 'x-default', href: absolutePageUrl('en', alternatesFor) },
+];
+const canonical = page ? absolutePageUrl(lang, page) : undefined;
+
+// Body font files needed for the first paint.
+const fontPreloads = lang === 'ru' ? [interLatin, interCyrillic] : [interLatin];
+---
+
+<!doctype html>
+<html lang={HTML_LANG[lang]}>
+  <head>
+    <meta charset="utf-8" />
+    {import.meta.env.PROD && <meta http-equiv="Content-Security-Policy" content={CSP} />}
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    {canonical && <link rel="canonical" href={canonical} />}
+    {alternates.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
+    {fontPreloads.map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}
+    <link rel="icon" href={publicUrl('favicon-32.png')} sizes="32x32" type="image/png" />
+    <link rel="icon" href={publicUrl('favicon.svg')} type="image/svg+xml" />
+    <link rel="apple-touch-icon" href={publicUrl('apple-touch-icon.png')} />
+    <script is:inline src={publicUrl('theme-init.js')}></script>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

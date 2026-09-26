@@ -1,0 +1,69 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Section from './Section.astro';
+import SiteFooter from './SiteFooter.astro';
+import SiteHeader from './SiteHeader.astro';
+import type { SectionId } from '../data/types';
+import { getProfile, type Locale } from '../lib/i18n';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = getProfile(lang);
+
+/** CV order: profile first, then career, then supporting detail. */
+const CV_SECTIONS: readonly SectionId[] = [
+  'about',
+  'focus',
+  'experience',
+  'work',
+  'education',
+  'publications',
+  'affiliations',
+  'skills',
+  'contact',
+];
+---
+
+<BaseLayout lang={lang} page="cv" title={t.meta.cv.title} description={t.meta.cv.description}>
+  <SiteHeader lang={lang} page="cv" />
+  <main id="main" class="cv">
+    <header class="cv__header reveal">
+      <div class="container">
+        <p class="label">{t.cv.heading}</p>
+        <h1 class="cv__name">{t.hero.name}</h1>
+        <p class="cv__line">{t.hero.lines[0]}</p>
+        <p class="cv__location label">{t.hero.location}</p>
+      </div>
+    </header>
+    {CV_SECTIONS.map((id) => <Section id={id} lang={lang} numbered={false} />)}
+  </main>
+  <SiteFooter lang={lang} />
+</BaseLayout>
+
+<style>
+  .cv__header {
+    padding-block: var(--space-2xl) var(--space-xl);
+  }
+
+  .cv__name {
+    margin-block-start: var(--space-xs);
+    font-size: min(var(--step-4), 11vw);
+    overflow-wrap: normal;
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+  }
+
+  .cv__line {
+    max-width: 40rem;
+    margin-block-start: var(--space-s);
+    font-size: var(--step-1);
+    line-height: 1.5;
+  }
+
+  .cv__location {
+    margin-block-start: var(--space-s);
+  }
+</style>
