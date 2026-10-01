@@ -2,8 +2,7 @@
 
 This is my personal website: a short profile of my work in sanitation and
 wastewater research, with a CV that prints cleanly to A4. It is in English
-and Russian and is published with GitHub Pages at
-https://sodikzoda-temur.github.io/Temur-Sodikzoda-web-portfolio/.
+and Russian and is published with GitHub Pages at https://tsodikzoda.com/.
 
 Pages: `/` and `/ru/` (home), `/cv/` and `/ru/cv/` (CV), and a 404 page in
 both languages.

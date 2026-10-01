@@ -3,7 +3,7 @@
  * To move to a custom domain, change this one line (for example to
  * 'https://example.org/'); `site` and `base` are derived from it.
  */
-export const SITE_URL = 'https://sodikzoda-temur.github.io/Temur-Sodikzoda-web-portfolio/';
+export const SITE_URL = 'https://tsodikzoda.com/';
 
 const url = new URL(SITE_URL);
 
