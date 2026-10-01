@@ -1,5 +1,6 @@
 ---
-import { EMAIL, PROFILE_LINKS } from '../../data/shared';
+import EmailLink from '../EmailLink.astro';
+import ProfileLinks from '../ProfileLinks.astro';
 import { getProfile, type Locale } from '../../lib/i18n';
 
 interface Props {
@@ -16,36 +17,17 @@ const t = getProfile(lang);
     <div>
       <dt class="subhead">{t.contact.emailLabel}</dt>
       <dd class="contact__value">
-        {/* The address is assembled by src/scripts/email.ts; it never appears whole in the HTML. */}
-        <span class="contact__email" data-email-user={EMAIL.user} data-email-domain={EMAIL.domain}>
-          <noscript>{`${EMAIL.user} ${t.contact.emailAt} ${EMAIL.domain}`}</noscript>
-        </span>
+        <EmailLink lang={lang} />
       </dd>
     </div>
     <div>
       <dt class="subhead">{t.contact.profilesLabel}</dt>
       <dd class="contact__value">
-        <ul class="contact__profiles" role="list">
-          {
-            PROFILE_LINKS.map((link) => (
-              <li>
-                <a class="tap-link" href={link.href} rel="noopener noreferrer" data-profile={link.id}>
-                  {link.label}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
+        <ProfileLinks />
       </dd>
     </div>
   </dl>
 </div>
-
-<script>
-  import { initEmail } from '../../scripts/email';
-
-  initEmail();
-</script>
 
 <style>
   .contact__availability {
@@ -59,24 +41,6 @@ const t = getProfile(lang);
 
   .contact__value {
     margin: 0;
-  }
-
-  /* Holds the line before the script adds the link, so nothing shifts */
-  .contact__email {
-    display: flex;
-    align-items: center;
-    min-height: var(--tap);
-    font-size: var(--step-1);
-    overflow-wrap: anywhere;
-  }
-
-  .contact__profiles {
-    display: flex;
-    flex-wrap: wrap;
-    column-gap: var(--space-l);
-    margin: 0;
-    padding: 0;
-    list-style: none;
     font-size: var(--step-1);
   }
 </style>

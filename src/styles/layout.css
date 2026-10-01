@@ -92,6 +92,13 @@
   min-height: var(--tap);
 }
 
+/* Printed copies of headings (see SectionLabel.astro) never show on screen */
+@media not print {
+  .print-copy {
+    display: none !important;
+  }
+}
+
 .visually-hidden {
   position: absolute !important;
   width: 1px !important;

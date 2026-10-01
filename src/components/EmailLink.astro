@@ -1,0 +1,27 @@
+---
+import { EMAIL } from '../data/shared';
+import { getProfile, type Locale } from '../lib/i18n';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = getProfile(lang);
+---
+
+{/* The address is assembled by src/scripts/email.ts; it never appears whole in the HTML. */}
+<span class="email-link" data-email-user={EMAIL.user} data-email-domain={EMAIL.domain}>
+  <noscript>{`${EMAIL.user} ${t.contact.emailAt} ${EMAIL.domain}`}</noscript>
+</span>
+
+<style>
+  /* Holds the line before the script adds the link, so nothing shifts */
+  .email-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+</style>

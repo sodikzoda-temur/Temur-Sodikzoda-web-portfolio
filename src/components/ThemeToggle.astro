@@ -14,12 +14,6 @@ const { label } = Astro.props;
   <span class="visually-hidden">{label}</span>
 </button>
 
-<script>
-  import { initThemeToggle } from '../scripts/theme';
-
-  initThemeToggle();
-</script>
-
 <style>
   /* Hidden until theme-init.js confirms JavaScript can run it */
   .theme-toggle {

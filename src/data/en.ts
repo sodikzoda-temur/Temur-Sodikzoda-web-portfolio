@@ -273,6 +273,7 @@ export default {
 
   cv: {
     heading: 'Curriculum vitae',
+    profile: 'Profile',
     download: 'Download PDF',
     references: 'References available on request.',
   },

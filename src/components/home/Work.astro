@@ -13,10 +13,11 @@ const t = getProfile(lang);
 
 <ul class="work" role="list">
   {
-    WORK_IDS.map((id) => {
+    WORK_IDS.map((id, index) => {
       const item = t.work[id];
       return (
         <li class="work__item" data-item={id}>
+          {index === 0 && <slot name="label" />}
           <h3 class="item-title">
             <Text value={item.title} />
           </h3>
@@ -69,6 +70,33 @@ const t = getProfile(lang);
   @media (width >= 48em) {
     .work {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /*
+   * Two columns on paper whatever width the browser reports. The rule moves
+   * from the item to its title, so the printed section heading in the first
+   * item sits above it; the second item leaves the same room, so both titles
+   * line up.
+   */
+  @media print {
+    .work {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-m) var(--grid-gap);
+    }
+
+    .work__item {
+      padding-block-start: 0;
+      border-top: 0;
+    }
+
+    .work__item > .item-title {
+      padding-block-start: var(--space-s);
+      border-top: var(--rule);
+    }
+
+    .work__item:nth-child(2) {
+      padding-block-start: calc(var(--size-label) * 1.5 + var(--space-s));
     }
   }
 </style>

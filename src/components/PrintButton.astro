@@ -1,0 +1,33 @@
+---
+interface Props {
+  label: string;
+}
+
+const { label } = Astro.props;
+---
+
+<button class="print-button" type="button" data-print>{label}</button>
+
+<style>
+  /* Printing needs JavaScript, so the button appears only when it can work */
+  .print-button {
+    display: none;
+  }
+
+  :global(.js) .print-button {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    padding-inline: var(--space-m);
+    border: 1px solid var(--brand);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--brand);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .print-button:hover {
+    background-color: var(--tint);
+  }
+</style>

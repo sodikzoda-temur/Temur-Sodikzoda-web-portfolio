@@ -1,8 +1,20 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import EmailLink from './EmailLink.astro';
+import PrintButton from './PrintButton.astro';
+import ProfileLinks from './ProfileLinks.astro';
 import Section from './Section.astro';
+import SectionLabel from './SectionLabel.astro';
 import SiteFooter from './SiteFooter.astro';
 import SiteHeader from './SiteHeader.astro';
+import About from './home/About.astro';
+import Affiliations from './home/Affiliations.astro';
+import Education from './home/Education.astro';
+import Experience from './home/Experience.astro';
+import Focus from './home/Focus.astro';
+import Publications from './home/Publications.astro';
+import Skills from './home/Skills.astro';
+import Work from './home/Work.astro';
 import type { SectionId } from '../data/types';
 import { getProfile, type Locale } from '../lib/i18n';
 
@@ -13,57 +25,132 @@ interface Props {
 const { lang } = Astro.props;
 const t = getProfile(lang);
 
-/** CV order: profile first, then career, then supporting detail. */
-const CV_SECTIONS: readonly SectionId[] = [
-  'about',
-  'focus',
-  'experience',
-  'work',
-  'education',
-  'publications',
-  'affiliations',
-  'skills',
-  'contact',
-];
+/** CV order: profile and research first, then delivery, then supporting detail. */
+const CV_SECTIONS = [
+  ['about', About],
+  ['focus', Focus],
+  ['experience', Experience],
+  ['work', Work],
+  ['education', Education],
+  ['publications', Publications],
+  ['affiliations', Affiliations],
+  ['skills', Skills],
+] as const satisfies ReadonlyArray<readonly [SectionId, (props: { lang: Locale }) => unknown]>;
 ---
 
 <BaseLayout lang={lang} page="cv" title={t.meta.cv.title} description={t.meta.cv.description}>
   <SiteHeader lang={lang} page="cv" />
   <main id="main" class="cv">
-    <header class="cv__header reveal">
+    <header class="cv-head reveal">
       <div class="container">
         <p class="label">{t.cv.heading}</p>
-        <h1 class="cv__name">{t.hero.name}</h1>
-        <p class="cv__line">{t.hero.lines[0]}</p>
-        <p class="cv__location label">{t.hero.location}</p>
+        <h1 class="cv-head__name">{t.hero.name}</h1>
+        <div class="cv-head__lines measure">
+          {t.hero.lines.map((line) => <p>{line}</p>)}
+        </div>
+        <p class="cv-head__location label">{t.hero.location}</p>
+        {t.contact.showAvailability && <p class="cv-head__availability measure">{t.contact.availability}</p>}
+        <div class="cv-head__contact">
+          <EmailLink lang={lang} />
+          <ProfileLinks />
+          <div class="cv-head__print">
+            <PrintButton label={t.cv.download} />
+          </div>
+        </div>
       </div>
     </header>
-    {CV_SECTIONS.map((id) => <Section id={id} lang={lang} numbered={false} />)}
+
+    {
+      CV_SECTIONS.map(([id, Body], index) => {
+        const label = id === 'about' ? t.cv.profile : undefined;
+        const section = (
+          <Section id={id} lang={lang} numbered={false} label={label}>
+            <Body lang={lang}>
+              <SectionLabel slot="label" id={id} lang={lang} numbered={false} label={label} copy />
+            </Body>
+          </Section>
+        );
+        // The last section and the closing line print on the same page.
+        return index < CV_SECTIONS.length - 1 ? (
+          section
+        ) : (
+          <div class="cv__tail">
+            {section}
+            <div class="cv__end">
+              <p class="container cv__references">{t.cv.references}</p>
+            </div>
+          </div>
+        );
+      })
+    }
   </main>
   <SiteFooter lang={lang} />
 </BaseLayout>
 
 <style>
-  .cv__header {
+  .cv-head {
     padding-block: var(--space-2xl) var(--space-xl);
   }
 
-  .cv__name {
+  .cv-head__name {
     margin-block-start: var(--space-xs);
     font-size: min(var(--step-4), 11vw);
-    overflow-wrap: normal;
     line-height: 1.05;
     letter-spacing: -0.015em;
+    overflow-wrap: normal;
   }
 
-  .cv__line {
-    max-width: 40rem;
+  .cv-head__lines {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-3xs);
     margin-block-start: var(--space-s);
     font-size: var(--step-1);
     line-height: 1.5;
   }
 
-  .cv__location {
+  .cv-head__location,
+  .cv-head__availability {
     margin-block-start: var(--space-s);
+  }
+
+  /* Email, profiles and the print button in one wrapping row */
+  .cv-head__contact {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2xs) var(--space-l);
+    margin-block-start: var(--space-m);
+    padding-block-start: var(--space-s);
+    border-top: var(--rule);
+  }
+
+  .cv-head__print {
+    margin-inline-start: auto;
+  }
+
+  .cv__end {
+    padding-block: var(--space-xl);
+    border-top: var(--rule);
+  }
+
+  .cv__references {
+    color: var(--muted);
+  }
+
+  @media print {
+    .cv-head {
+      padding-block: 0 var(--space-m);
+    }
+
+    .cv__end {
+      padding-block: var(--space-m) 0;
+      break-before: avoid-page;
+    }
+
+    /* The closing line never starts a page on its own */
+    .cv__tail {
+      break-inside: avoid;
+    }
   }
 </style>

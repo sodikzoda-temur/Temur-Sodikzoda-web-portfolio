@@ -67,7 +67,7 @@ test.describe('fonts', () => {
     for (const file of requested) expect(file).toMatch(/-(latin|cyrillic)-(wght|500)-normal\.[\w-]+\.woff2$/);
   });
 
-  for (const path of ['', 'ru/']) {
+  for (const path of ['', 'cv/', 'ru/', 'ru/cv/']) {
     test(`every visible text on /${path} is drawn with the web fonts, not system fonts`, async ({ page, browserName }) => {
       test.skip(browserName !== 'chromium', 'Uses the Chromium DevTools protocol');
       await visit(page, path);

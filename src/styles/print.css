@@ -1,0 +1,269 @@
+/*
+ * Print: A4, dark text on white whatever the screen theme, no site chrome,
+ * entries kept whole, headings kept with what follows, links shown as text.
+ */
+
+@page {
+  size: A4;
+  margin: 15mm 16mm 16mm;
+}
+
+/*
+ * CV sheets carry the name and page number at the foot and nothing at the top,
+ * in place of the browser's own header and footer (date, title, address).
+ * Margin boxes cannot read the page, so these are the only texts held in CSS:
+ * "Temur Sodikzoda · CV" and «Темур Содикзода · Резюме», written as escapes.
+ * Keep them in line with hero.name and cv.heading in src/data. Browsers
+ * without margin boxes print as before.
+ */
+@page cv-en {
+  @top-left {
+    content: "";
+  }
+
+  @top-center {
+    content: "";
+  }
+
+  @top-right {
+    content: "";
+  }
+
+  @bottom-left {
+    content: "Temur Sodikzoda \0000b7\000020CV";
+    font: 500 7.5pt 'JetBrains Mono', ui-monospace, monospace;
+    color: #4c5c52;
+  }
+
+  @bottom-center {
+    content: "";
+  }
+
+  @bottom-right {
+    content: counter(page) " / " counter(pages);
+    font: 500 7.5pt 'JetBrains Mono', ui-monospace, monospace;
+    color: #4c5c52;
+  }
+}
+
+@page cv-ru {
+  @top-left {
+    content: "";
+  }
+
+  @top-center {
+    content: "";
+  }
+
+  @top-right {
+    content: "";
+  }
+
+  @bottom-left {
+    content: "\000422\000435\00043c\000443\000440\000020\000421\00043e\000434\000438\00043a\000437\00043e\000434\000430\000020\0000b7\000020\000420\000435\000437\00044e\00043c\000435";
+    font: 500 7.5pt 'JetBrains Mono', ui-monospace, monospace;
+    color: #4c5c52;
+  }
+
+  @bottom-center {
+    content: "";
+  }
+
+  @bottom-right {
+    content: counter(page) " / " counter(pages);
+    font: 500 7.5pt 'JetBrains Mono', ui-monospace, monospace;
+    color: #4c5c52;
+  }
+}
+
+@media print {
+  /* Light colours and print sizes. The repeated :root outranks the dark theme rules. */
+  :root:root:root {
+    color-scheme: light;
+    --bg: #fff;
+    --surface: #fff;
+    --ink: #0f1d16;
+    --muted: #4c5c52;
+    --line: #c9d4cb;
+    --brand: #1d5b43;
+    --brand-deep: #123d2d;
+    --accent: #3db27a;
+    --tint: #fff;
+
+    --step--1: 7.5pt;
+    --step-0: 9.5pt;
+    --step-1: 10.5pt;
+    --step-2: 12pt;
+    --step-3: 14pt;
+    --step-4: 20pt;
+    --step-5: 24pt;
+
+    --space-3xs: 0.6mm;
+    --space-2xs: 1.2mm;
+    --space-xs: 1.8mm;
+    --space-s: 2.5mm;
+    --space-m: 3.5mm;
+    --space-l: 4.5mm;
+    --space-xl: 6mm;
+    --space-2xl: 7mm;
+    --space-3xl: 9mm;
+
+    --gutter: 0px;
+    --grid-gap: 5mm;
+    --header-h: 0px;
+    --tap: 0px;
+  }
+
+  body {
+    display: block;
+    min-height: 0;
+    background: #fff;
+    line-height: 1.45;
+  }
+
+  /* Site chrome and decoration */
+  .skip-link,
+  .site-header,
+  .site-footer,
+  .print-button,
+  .hero__links {
+    display: none !important;
+  }
+
+  .container {
+    max-width: none;
+  }
+
+  /* Section label above its content. Component layouts set their own print columns. */
+  .grid {
+    display: block;
+  }
+
+  .section {
+    padding-block: var(--space-m) var(--space-s);
+  }
+
+  .section__label {
+    margin-block-end: var(--space-s);
+  }
+
+  .entry {
+    grid-template-columns: 30mm minmax(0, 1fr);
+  }
+
+  .entry--short {
+    grid-template-columns: 12mm minmax(0, 1fr);
+  }
+
+  /* Russian periods are longer: «с октября 2022 года / по настоящее время» */
+  :lang(ru) .entry:not(.entry--short) {
+    grid-template-columns: 36mm minmax(0, 1fr);
+  }
+
+  .entry__aside {
+    padding-block-start: 0.2em;
+  }
+
+  .pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tag {
+    padding: 0.2mm 1.4mm;
+    border: 0.5pt solid var(--line);
+  }
+
+  /* Links as text: the address of an external link follows its label */
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Inline, so the address wraps with the text and keeps its leading space */
+  .tap-link {
+    display: inline;
+  }
+
+  a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    color: var(--muted);
+    font-size: 0.9em;
+    overflow-wrap: anywhere;
+  }
+
+  /*
+   * Page breaks: no cut entries, no heading left at the bottom of a page.
+   * break-after works in Chromium and Safari only. What every browser honours
+   * is break-inside: avoid, so headings are also kept inside the box of what
+   * follows them: short sections print whole, and a heading that precedes a
+   * list prints as a copy inside the list's first item (see SectionLabel.astro).
+   */
+  h1,
+  h2,
+  h3,
+  h4,
+  .label,
+  .subhead {
+    break-after: avoid-page;
+    break-inside: avoid;
+  }
+
+  .section--whole {
+    break-inside: avoid;
+  }
+
+  .section__label.print-copy {
+    display: flex;
+  }
+
+  .print-copy {
+    display: block;
+    grid-column: 1 / -1;
+  }
+
+  /* The originals of the printed copies */
+  .section:has(.section__label.print-copy) > .container > .section__label,
+  .education__group > .subhead,
+  .pubs__year:not(.print-copy) {
+    display: none;
+  }
+
+  /* An aside sits beside its entry in the same grid row: nothing to keep */
+  .entry__aside {
+    break-after: auto;
+  }
+
+  .cv-head,
+  .entry,
+  .work__item,
+  .focus__item,
+  .pub,
+  .rule-list > li,
+  .points > li,
+  .skills__language,
+  .pair > *,
+  .tags {
+    break-inside: avoid;
+  }
+
+  /* Publication years may split between citations, never inside one */
+  .pubs__years > li {
+    display: block;
+    break-inside: auto;
+  }
+
+  p,
+  li,
+  dd {
+    orphans: 3;
+    widows: 3;
+  }
+
+  html:lang(en-GB) main.cv {
+    page: cv-en;
+  }
+
+  html:lang(ru) main.cv {
+    page: cv-ru;
+  }
+}

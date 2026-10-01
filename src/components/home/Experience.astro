@@ -13,10 +13,11 @@ const t = getProfile(lang);
 
 <ol class="rule-list" role="list">
   {
-    EXPERIENCE_IDS.map((id) => {
+    EXPERIENCE_IDS.map((id, index) => {
       const role = t.experience[id];
       return (
         <li class="entry" data-item={id}>
+          {index === 0 && <slot name="label" />}
           <p class="entry__aside">{role.period}</p>
           <div class="entry__main measure">
             <h3 class="item-title">{role.role}</h3>

@@ -38,7 +38,7 @@ const alternates = [
 ];
 const canonical = page ? absolutePageUrl(lang, page) : undefined;
 
-// Body font files needed for the first paint.
+// Body font files needed for the first paint, preloaded at the start of <body>.
 const fontPreloads = lang === 'ru' ? [interLatin, interCyrillic] : [interLatin];
 ---
 
@@ -54,13 +54,14 @@ const fontPreloads = lang === 'ru' ? [interLatin, interCyrillic] : [interLatin];
     {noindex && <meta name="robots" content="noindex" />}
     {canonical && <link rel="canonical" href={canonical} />}
     {alternates.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
-    {fontPreloads.map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}
     <link rel="icon" href={publicUrl('favicon-32.png')} sizes="32x32" type="image/png" />
     <link rel="icon" href={publicUrl('favicon.svg')} type="image/svg+xml" />
     <link rel="apple-touch-icon" href={publicUrl('apple-touch-icon.png')} />
     <script is:inline src={publicUrl('theme-init.js')}></script>
   </head>
   <body>
+    {/* After the stylesheet, so the CSS request is not queued behind the font files. */}
+    {fontPreloads.map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}
     <slot />
   </body>
 </html>

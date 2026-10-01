@@ -1,0 +1,35 @@
+---
+import type { SectionId } from '../data/types';
+import { getProfile, sectionNumber, type Locale } from '../lib/i18n';
+
+interface Props {
+  id: SectionId;
+  lang: Locale;
+  /** Show the two-digit number before the label (home page). */
+  numbered?: boolean;
+  /** Replaces the section's usual label, e.g. "Profile" for About on the CV. */
+  label?: string;
+  /**
+   * The printed copy. Lists cannot hold the section heading, so the body puts
+   * this copy inside its first item, where it stays on the item's page; print
+   * shows the copy instead of the heading. Hidden on screen, even without CSS.
+   */
+  copy?: boolean;
+}
+
+const { id, lang, numbered = true, copy = false } = Astro.props;
+const label = Astro.props.label ?? getProfile(lang).sections[id];
+const number = numbered ? sectionNumber(id) : undefined;
+// About opens the home page without a visible label; its heading stays for screen readers.
+const hiddenLabel = numbered && number === undefined;
+---
+
+<h2
+  id={copy ? undefined : `${id}-label`}
+  class:list={['section__label', 'label', { 'visually-hidden': hiddenLabel, 'print-copy': copy }]}
+  hidden={copy}
+>
+  {/* The number is visual ordering only; headings are announced by name. */}
+  {number && <span class="section__num" aria-hidden="true">{number}</span>}
+  <span>{label}</span>
+</h2>

@@ -20,16 +20,22 @@ const author = typesetCitation(CITATION_AUTHOR[lang], lang);
 <div class="pubs">
   <ol class="rule-list pubs__years" role="list">
     {
-      years.map((year) => (
+      years.map((year, yearIndex) => (
         <li class="entry entry--short" data-year={year}>
           <h3 class="entry__aside pubs__year">{year}</h3>
           <ol class="pubs__list" role="list">
             {entries
               .filter((entry) => entry.year === year)
-              .map((entry) => {
+              .map((entry, index) => {
                 const parts = splitAround(entry.citation, author);
                 return (
                   <li class="pub">
+                    {yearIndex === 0 && index === 0 && <slot name="label" />}
+                    {index === 0 && (
+                      <h3 class="entry__aside pubs__year print-copy" hidden>
+                        {year}
+                      </h3>
+                    )}
                     <p class="pub__citation">
                       {parts ? (
                         <>
@@ -75,8 +81,40 @@ const author = typesetCitation(CITATION_AUTHOR[lang], lang);
 
   .pub__note {
     margin-block-start: var(--space-3xs);
-    font-size: 0.875rem;
+    font-size: 0.875em;
     color: var(--muted);
+  }
+
+  /*
+   * On paper a year's citations are blocks beside the year, so a year can
+   * continue on the next page between citations. The first citation carries
+   * the printed year (and on the first year the section heading), so the year
+   * never ends a page alone.
+   */
+  @media print {
+    .pubs__list {
+      display: block;
+      margin-inline-start: 17mm;
+    }
+
+    .pub {
+      display: flow-root;
+    }
+
+    .pub + .pub {
+      margin-block-start: var(--space-m);
+    }
+
+    /* The copies come from other components too (the section heading), hence :global */
+    .pub > :global(.print-copy) {
+      margin-inline-start: -17mm;
+    }
+
+    .pub > .pubs__year {
+      float: left;
+      width: 12mm;
+      padding-block-start: 0.1em;
+    }
   }
 
   .pubs__closing {

@@ -281,6 +281,7 @@ const ru = {
 
   cv: {
     heading: 'Резюме',
+    profile: 'О себе',
     download: 'Скачать PDF',
     references: 'Рекомендации предоставляются по запросу.',
   },

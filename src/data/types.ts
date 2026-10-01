@@ -194,7 +194,11 @@ export interface Profile {
   cv: {
     /** Label above the name on the CV page. */
     heading: string;
+    /** Label of the About text on the CV. */
+    profile: string;
+    /** Print button; it opens the browser's print dialog, where a PDF can be saved. */
     download: string;
+    /** Closing line of the CV. */
     references: string;
   };
   notFound: {

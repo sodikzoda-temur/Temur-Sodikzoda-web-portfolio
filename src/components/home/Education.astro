@@ -18,10 +18,16 @@ const { degrees, training } = t.education;
     <h3 class="subhead">{t.education.degreesLabel}</h3>
     <ol class="rule-list" role="list">
       {
-        DEGREE_IDS.map((id) => {
+        DEGREE_IDS.map((id, index) => {
           const degree = degrees[id];
           return (
             <li class="entry" data-item={id}>
+              {index === 0 && <slot name="label" />}
+              {index === 0 && (
+                <h3 class="subhead print-copy" hidden>
+                  {t.education.degreesLabel}
+                </h3>
+              )}
               <p class="entry__aside">{degree.period}</p>
               <div class="entry__main measure">
                 <h4 class="item-title">{joinParts(degree.degree, degree.field)}</h4>
@@ -43,10 +49,15 @@ const { degrees, training } = t.education;
     <h3 class="subhead">{t.education.trainingLabel}</h3>
     <ol class="rule-list rule-list--compact" role="list">
       {
-        TRAINING_IDS.map((id) => {
+        TRAINING_IDS.map((id, index) => {
           const course = training[id];
           return (
             <li class="entry entry--short" data-item={id}>
+              {index === 0 && (
+                <h3 class="subhead print-copy" hidden>
+                  {t.education.trainingLabel}
+                </h3>
+              )}
               <p class="entry__aside">{course.year}</p>
               <div class="entry__main measure">
                 <p class="education__course">

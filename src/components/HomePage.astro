@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from './Hero.astro';
 import Section from './Section.astro';
+import SectionLabel from './SectionLabel.astro';
 import SiteFooter from './SiteFooter.astro';
 import SiteHeader from './SiteHeader.astro';
 import About from './home/About.astro';
@@ -46,7 +47,9 @@ const BODIES = {
         const Body = BODIES[id];
         return (
           <Section id={id} lang={lang}>
-            <Body lang={lang} />
+            <Body lang={lang}>
+              <SectionLabel slot="label" id={id} lang={lang} copy />
+            </Body>
           </Section>
         );
       })

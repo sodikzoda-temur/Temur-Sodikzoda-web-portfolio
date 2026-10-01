@@ -1,28 +1,28 @@
 ---
+import SectionLabel from './SectionLabel.astro';
 import type { SectionId } from '../data/types';
-import { getProfile, sectionNumber, type Locale } from '../lib/i18n';
+import type { Locale } from '../lib/i18n';
 
 interface Props {
   id: SectionId;
   lang: Locale;
   /** Show the two-digit number before the label (home page). */
   numbered?: boolean;
+  /** Replaces the section's usual label, e.g. "Profile" for About on the CV. */
+  label?: string;
 }
 
-const { id, lang, numbered = true } = Astro.props;
-const label = getProfile(lang).sections[id];
-const number = numbered ? sectionNumber(id) : undefined;
-// About opens the page without a visible label; its heading stays for screen readers.
-const hiddenLabel = numbered && number === undefined;
+const { id, lang, numbered = true, label } = Astro.props;
+
+// Short sections print whole, heading included. Longer ones put a printed copy
+// of their heading into their first item (see SectionLabel), so in print a
+// heading never ends a page without its first entry, in every browser.
+const PRINT_WHOLE: readonly SectionId[] = ['about', 'affiliations', 'skills', 'contact'];
 ---
 
-<section id={id} class="section reveal" aria-labelledby={`${id}-label`}>
+<section id={id} class:list={['section', 'reveal', { 'section--whole': PRINT_WHOLE.includes(id) }]} aria-labelledby={`${id}-label`}>
   <div class="container grid">
-    <h2 id={`${id}-label`} class:list={['section__label', 'label', { 'visually-hidden': hiddenLabel }]}>
-      {/* The number is visual ordering only; headings are announced by name. */}
-      {number && <span class="section__num" aria-hidden="true">{number}</span>}
-      <span>{label}</span>
-    </h2>
+    <SectionLabel id={id} lang={lang} numbered={numbered} label={label} />
     <div class="section__body">
       <slot />
     </div>

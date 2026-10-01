@@ -111,4 +111,11 @@ const t = getProfile(lang);
       max-width: 22rem;
     }
   }
+
+  @media print {
+    .hero {
+      padding-block: 0 var(--space-m);
+      background-image: none;
+    }
+  }
 </style>

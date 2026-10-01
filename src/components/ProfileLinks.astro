@@ -1,0 +1,26 @@
+---
+import { PROFILE_LINKS } from '../data/shared';
+---
+
+<ul class="profile-links" role="list">
+  {
+    PROFILE_LINKS.map((link) => (
+      <li>
+        <a class="tap-link" href={link.href} rel="noopener noreferrer" data-profile={link.id}>
+          {link.label}
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .profile-links {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--space-l);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>
