@@ -43,13 +43,15 @@ test.describe('print styles', () => {
     for (const theme of ['stored dark', 'system dark'] as const) {
       test(`${name} in ${theme}: no site chrome, dark text on white, no backgrounds`, async ({ page }) => {
         await openDark(page, path, theme);
-        await page.emulateMedia({ media: 'print' });
-        // Still dark by choice or by system, yet printed light
-        const dark = await page.evaluate(() => ({
+        // Dark by choice or by system on screen (Firefox reports print media as light, so check before printing)
+        const darkOnScreen = await page.evaluate(() => ({
           stored: document.documentElement.dataset.theme === 'dark',
           system: matchMedia('(prefers-color-scheme: dark)').matches,
         }));
-        expect(theme === 'stored dark' ? dark.stored : dark.system).toBe(true);
+        expect(theme === 'stored dark' ? darkOnScreen.stored : darkOnScreen.system).toBe(true);
+        await page.emulateMedia({ media: 'print' });
+        // The stored choice is still in place, yet the page prints light
+        if (theme === 'stored dark') expect(await page.evaluate(() => document.documentElement.dataset.theme)).toBe('dark');
         await expect(page.locator('body')).toHaveCSS('background-color', WHITE);
 
         const chrome = ['.skip-link', '.site-header', '[data-menu-toggle]', '[data-theme-toggle]', '.lang-switch', '.site-footer', '[data-print]', '.hero__links'];
@@ -270,7 +272,10 @@ test.describe('printed PDF', () => {
             return copy.textContent ?? '';
           }),
       );
-      expect(pdf.outline.map((entry) => compact(entry.title))).toEqual(headings.map(compact));
+      // Some Chromium versions also put a home section's number ("06") in its
+      // bookmark, which is harmless: it is part of the printed heading.
+      const bookmark = (title: string) => compact(title).replace(/^\d{2}(?=\p{L})/u, '');
+      expect(pdf.outline.map((entry) => bookmark(entry.title))).toEqual(headings.map(compact));
 
       expect(breakProblems(pdf)).toEqual([]);
       expect(pdf.elements.filter((element) => element.type === 'LI').length).toBeGreaterThan(0);
@@ -305,7 +310,8 @@ test.describe('printed PDF', () => {
 
       // The site's fonts, embedded
       expect(pdf.fonts.length).toBeGreaterThan(0);
-      expect(pdf.fonts.filter((font) => !/^(Inter|SourceSerif4|JetBrainsMono)-/.test(font))).toEqual([]);
+      // Names as embedded by Chromium; spaces and suffixes vary between versions.
+      expect(pdf.fonts.filter((font) => !/^(Inter|Source ?Serif ?4|JetBrains ?Mono)/i.test(font))).toEqual([]);
     });
   }
 });

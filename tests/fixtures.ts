@@ -4,7 +4,7 @@ import { SITE } from '../src/config.ts';
 
 export { expect };
 
-/** Base path of the site, e.g. "/Temur-Sodikzoda-web-portfolio/". */
+/** Base path of the site: "/" at the domain root, or e.g. "/repository-name/" on a github.io project site. */
 export const BASE = SITE.base;
 
 export interface SitePage {
@@ -53,8 +53,22 @@ interface Fixtures {
 export const test = base.extend<Fixtures>({
   allowedConsoleErrors: [[], { option: true }],
   pageProblems: [
-    async ({ page, allowedConsoleErrors }, use) => {
+    async ({ page, allowedConsoleErrors, browserName, baseURL }, use) => {
       const problems: string[] = [];
+
+      // The policy's upgrade-insecure-requests makes WebKit ask for every
+      // same-site file over https, also on the local http test server, where
+      // that fails. Serve those requests from the http server instead, so the
+      // tests run with the production policy unchanged.
+      if (browserName === 'webkit' && baseURL?.startsWith('http://')) {
+        const origin = new URL(baseURL).origin;
+        const upgraded = origin.replace('http://', 'https://');
+        await page.context().route(`${upgraded}/**`, async (route) => {
+          const response = await route.fetch({ url: route.request().url().replace(upgraded, origin) });
+          await route.fulfill({ response });
+        });
+      }
+
       const allowed = (text: string) => allowedConsoleErrors.some((pattern) => pattern.test(text));
 
       page.on('console', (message) => {
