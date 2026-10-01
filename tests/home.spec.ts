@@ -2,7 +2,7 @@ import en from '../src/data/en.ts';
 import ru from '../src/data/ru.ts';
 import { EMAIL, PROFILE_LINKS, SHOW_AVAILABILITY } from '../src/data/shared.ts';
 import type { Profile } from '../src/data/types.ts';
-import { BASE, expect, test, visit } from './fixtures';
+import { atPath, BASE, expect, test, visit } from './fixtures';
 import { data, item, plain, sharedSectionTests, text, texts } from './sections';
 
 // Section 7 of the brief, written out here on purpose instead of imported.
@@ -116,7 +116,7 @@ test.describe('navigation anchors', () => {
       await visit(page, path);
       for (const id of NAV_ORDER) {
         await page.locator('.site-nav__link', { hasText: plain(t.nav[id as keyof Profile['nav']]) }).click();
-        await expect(page).toHaveURL(`${BASE}${path}#${id}`);
+        await expect(page).toHaveURL(atPath(`${BASE}${path}#${id}`));
         const { headerBottom, top, atEnd } = await page.evaluate((sectionId) => {
           const root = document.documentElement;
           return {

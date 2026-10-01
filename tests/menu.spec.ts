@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { BASE, expect, test, visit } from './fixtures';
+import { atPath, BASE, expect, test, visit } from './fixtures';
 
 const toggle = (page: Page) => page.locator('[data-menu-toggle]');
 const panel = (page: Page) => page.locator('#site-menu');
@@ -62,7 +62,7 @@ test.describe('mobile menu at 360px', () => {
     await toggle(page).click();
     await firstLink(page).click();
     await expectOpen(page, false);
-    await expect(page).toHaveURL(`${BASE}#focus`);
+    await expect(page).toHaveURL(atPath(`${BASE}#focus`));
   });
 
   test('closes on a click or tap outside the header', async ({ page }) => {

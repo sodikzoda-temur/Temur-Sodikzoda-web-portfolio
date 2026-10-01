@@ -32,6 +32,13 @@ export const MISSING_PATH = 'ru/no-such-page/deeper/';
 /** Every page including the 404 page, for checks that apply everywhere. */
 export const ALL_PATHS: readonly string[] = [...SITE_PAGES.map((p) => p.path), MISSING_PATH];
 
+/**
+ * Matches the page URL by path and hash, for toHaveURL. Under the policy's
+ * upgrade-insecure-requests WebKit follows same-site links over https on the
+ * local http test server, so the scheme is not compared.
+ */
+export const atPath = (expected: string) => (url: URL) => `${url.pathname}${url.search}${url.hash}` === expected;
+
 /** Navigate relative to the base URL; '' is the English home page. */
 export const visit = (page: Page, path: string) => page.goto(path === '' ? './' : path);
 

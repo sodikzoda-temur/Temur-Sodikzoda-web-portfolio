@@ -1,4 +1,4 @@
-import { BASE, SITE_PAGES, expect, test, visit } from './fixtures';
+import { atPath, BASE, expect, SITE_PAGES, test, visit } from './fixtures';
 
 const switchLink = (code: 'en' | 'ru') => `.lang-switch a[hreflang="${code}"]`;
 
@@ -12,7 +12,7 @@ test.describe('language switch (wide screen)', () => {
       await expect(page.locator(switchLink(other))).not.toHaveAttribute('aria-current', /.*/);
 
       await page.locator(switchLink(other)).click();
-      await expect(page).toHaveURL(`${BASE}${sitePage.twin}`);
+      await expect(page).toHaveURL(atPath(`${BASE}${sitePage.twin}`));
       await expect(page.locator('html')).toHaveAttribute('lang', other === 'en' ? 'en-GB' : 'ru');
       await expect(page.locator(switchLink(other))).toHaveAttribute('aria-current', 'page');
     });
@@ -38,6 +38,6 @@ test.describe('language switch (small screen)', () => {
     await visit(page, 'cv/');
     await page.locator('[data-menu-toggle]').click();
     await page.locator(switchLink('ru')).click();
-    await expect(page).toHaveURL(`${BASE}ru/cv/`);
+    await expect(page).toHaveURL(atPath(`${BASE}ru/cv/`));
   });
 });
