@@ -1,4 +1,4 @@
-import { SHOW_AVAILABILITY } from './shared';
+import { SHOW_AVAILABILITY } from './shared.ts';
 import type { Profile } from './types';
 
 export default {

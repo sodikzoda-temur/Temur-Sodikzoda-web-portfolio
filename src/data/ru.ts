@@ -1,6 +1,6 @@
 import type en from './en';
-import { inEnglish, rich } from './markup';
-import { SHOW_AVAILABILITY } from './shared';
+import { inEnglish, rich } from './markup.ts';
+import { SHOW_AVAILABILITY } from './shared.ts';
 import type { Profile, ShapeOf } from './types';
 
 // Same keys, optional fields and list lengths as en.ts, checked by ShapeOf.

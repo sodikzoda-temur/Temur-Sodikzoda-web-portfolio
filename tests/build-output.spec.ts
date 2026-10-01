@@ -31,8 +31,11 @@ test.describe('build output', () => {
     for (const file of htmlFiles()) {
       const name = relative(DIST, file);
       const html = readFileSync(file, 'utf8');
+      // Inline scripts: only JSON-LD, a data block that never runs.
       const scripts = html.match(/<script\b[^>]*>/gi) ?? [];
-      expect.soft(scripts.filter((tag) => !/\ssrc=/i.test(tag)), `${name}: inline <script>`).toEqual([]);
+      const inline = scripts.filter((tag) => !/\ssrc=/i.test(tag));
+      expect.soft(inline.filter((tag) => tag !== '<script type="application/ld+json">'), `${name}: inline <script>`).toEqual([]);
+      expect.soft(inline.length, `${name}: JSON-LD blocks`).toBe(/^(ru\/)?index\.html$/.test(name) ? 1 : 0);
       expect.soft(html, `${name}: <style> element`).not.toMatch(/<style\b/i);
       expect.soft(html, `${name}: style attribute`).not.toMatch(/\sstyle=/i);
       expect.soft(html, `${name}: event handler attribute`).not.toMatch(/\son[a-z]+=/i);

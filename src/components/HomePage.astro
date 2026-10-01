@@ -16,6 +16,7 @@ import Skills from './home/Skills.astro';
 import Work from './home/Work.astro';
 import { SECTION_IDS, type SectionId } from '../data/types';
 import { getProfile, type Locale } from '../lib/i18n';
+import { personJsonLd } from '../lib/seo';
 
 interface Props {
   lang: Locale;
@@ -38,7 +39,7 @@ const BODIES = {
 } satisfies Record<SectionId, (props: { lang: Locale }) => unknown>;
 ---
 
-<BaseLayout lang={lang} page="home" title={t.meta.home.title} description={t.meta.home.description}>
+<BaseLayout lang={lang} page="home" title={t.meta.home.title} description={t.meta.home.description} jsonLd={await personJsonLd(lang)}>
   <SiteHeader lang={lang} page="home" />
   <main id="main">
     <Hero lang={lang} />

@@ -2,7 +2,8 @@
 import '../styles/global.css';
 import interLatin from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
 import interCyrillic from '@fontsource-variable/inter/files/inter-cyrillic-wght-normal.woff2?url';
-import { absolutePageUrl, HTML_LANG, LOCALES, publicUrl, type Locale, type PageKey } from '../lib/i18n';
+import { absolutePageUrl, getProfile, HTML_LANG, LOCALES, publicUrl, type Locale, type PageKey } from '../lib/i18n';
+import { OG_LOCALE, socialImage } from '../lib/seo';
 
 interface Props {
   lang: Locale;
@@ -11,9 +12,11 @@ interface Props {
   /** Page that exists in both languages; drives canonical and hreflang links. */
   page?: PageKey;
   noindex?: boolean;
+  /** Structured data for the page, emitted as a JSON-LD data block. */
+  jsonLd?: object;
 }
 
-const { lang, title, description, page, noindex = false } = Astro.props;
+const { lang, title, description, page, noindex = false, jsonLd } = Astro.props;
 
 // GitHub Pages cannot send headers, so the policy is delivered as a meta tag.
 // Only in the build: the dev server injects inline styles for hot reloading.
@@ -38,6 +41,12 @@ const alternates = [
 ];
 const canonical = page ? absolutePageUrl(lang, page) : undefined;
 
+// Social previews for the pages that exist in both languages.
+const image = socialImage(lang);
+const other = LOCALES.filter((code) => code !== lang);
+// A data block, never executed; "<" is escaped so the JSON cannot close the element.
+const jsonLdText = jsonLd && JSON.stringify(jsonLd).replaceAll('<', '\\u003c');
+
 // Body font files needed for the first paint, preloaded at the start of <body>.
 const fontPreloads = lang === 'ru' ? [interLatin, interCyrillic] : [interLatin];
 ---
@@ -54,6 +63,29 @@ const fontPreloads = lang === 'ru' ? [interLatin, interCyrillic] : [interLatin];
     {noindex && <meta name="robots" content="noindex" />}
     {canonical && <link rel="canonical" href={canonical} />}
     {alternates.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
+    {
+      canonical && (
+        <>
+          <meta property="og:type" content={page === 'home' ? 'profile' : 'website'} />
+          <meta property="og:site_name" content={getProfile(lang).hero.name} />
+          <meta property="og:title" content={title} />
+          <meta property="og:description" content={description} />
+          <meta property="og:url" content={canonical} />
+          <meta property="og:locale" content={OG_LOCALE[lang]} />
+          {other.map((code) => <meta property="og:locale:alternate" content={OG_LOCALE[code]} />)}
+          <meta property="og:image" content={image.url} />
+          <meta property="og:image:width" content={String(image.width)} />
+          <meta property="og:image:height" content={String(image.height)} />
+          <meta property="og:image:alt" content={image.alt} />
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={title} />
+          <meta name="twitter:description" content={description} />
+          <meta name="twitter:image" content={image.url} />
+          <meta name="twitter:image:alt" content={image.alt} />
+        </>
+      )
+    }
+    {jsonLdText && <script is:inline type="application/ld+json" set:html={jsonLdText} />}
     <link rel="icon" href={publicUrl('favicon-32.png')} sizes="32x32" type="image/png" />
     <link rel="icon" href={publicUrl('favicon.svg')} type="image/svg+xml" />
     <link rel="apple-touch-icon" href={publicUrl('apple-touch-icon.png')} />
