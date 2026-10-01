@@ -1,0 +1,115 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Read-only by default; only the deploy job may publish to Pages.
+permissions:
+  contents: read
+
+# One deployment at a time; a running one is never cancelled.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx astro check
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: Test in Chromium
+        run: npx playwright test --project=chromium
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+
+  # Checks the live site from outside: pages, 404, robots.txt, sitemap,
+  # HTTPS redirect, certificate and the security meta tags.
+  verify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+      - name: Check the live site
+        run: |
+          set -uo pipefail
+          # The address comes from src/config.ts, the one place it is set.
+          site=$(node --experimental-strip-types --disable-warning=ExperimentalWarning -e "import('./src/config.ts').then((m) => console.log(m.SITE_URL))")
+          host=$(node -e "console.log(new URL(process.argv[1]).host)" "$site")
+          echo "Site: $site"
+
+          # Network errors count as status 000 and fail the check, never the script.
+          fetch() { curl -sS --retry 3 --retry-all-errors --max-time 30 "$@" || true; }
+          status() { fetch -o /dev/null -w '%{http_code}' "$1"; }
+
+          fail=0
+          pass() { echo "PASS $*"; }
+          failed() { echo "FAIL $*"; fail=1; }
+
+          # Pages can take a few minutes to serve a new deployment.
+          for attempt in $(seq 1 18); do
+            [ "$(status "$site")" = 200 ] && break
+            echo "Waiting for $site ($attempt)"; sleep 10
+          done
+
+          expect() { # url, expected status
+            local got
+            got=$(status "$1")
+            if [ "$got" = "$2" ]; then pass "$got $1"; else failed "$got (expected $2) $1"; fi
+          }
+          for path in "" cv/ ru/ ru/cv/ robots.txt sitemap.xml og-en.png og-ru.png; do expect "$site$path" 200; done
+          expect "${site}no-such-page/" 404
+
+          # http:// redirects to https://
+          redirect=$(fetch -o /dev/null -w '%{http_code} %{redirect_url}' "http://${site#https://}")
+          case "$redirect" in
+            301\ https://*) pass "http redirects: $redirect" ;;
+            *) failed "http does not redirect to https: $redirect" ;;
+          esac
+
+          # Certificate valid for the host: curl verifies it. Then its subject and expiry.
+          if curl -sS --retry 3 --retry-all-errors --max-time 30 -o /dev/null "$site"; then pass "certificate valid for $host"; else failed "certificate check for $host"; fi
+          echo | openssl s_client -connect "$host:443" -servername "$host" 2>/dev/null | openssl x509 -noout -subject -enddate || true
+
+          # Security meta tags and no insecure asset URLs in the live pages
+          for path in "" cv/ ru/ ru/cv/; do
+            html=$(fetch "$site$path")
+            if [ -z "$html" ]; then failed "no HTML from /$path"; continue; fi
+            if grep -q '<meta http-equiv="Content-Security-Policy"' <<<"$html"; then pass "CSP on /$path"; else failed "no CSP on /$path"; fi
+            if grep -q '<meta name="referrer" content="strict-origin-when-cross-origin"' <<<"$html"; then pass "referrer policy on /$path"; else failed "no referrer policy on /$path"; fi
+            if grep -Eq '(src|href)="http:' <<<"$html"; then failed "http: URL on /$path"; else pass "no http: URLs on /$path"; fi
+          done
+          exit $fail
