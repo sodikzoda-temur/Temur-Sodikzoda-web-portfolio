@@ -22,7 +22,9 @@ export default {
     themeToggle: 'Dark theme',
     languageLabel: 'Language',
     researchInterest: 'Research interest',
-    portraitAlt: 'Temur Sodikzoda',
+    portraitAlt: 'Portrait of Temur Sodikzoda',
+    saveContact: 'Save contact (.vcf)',
+    contactQr: 'Scan with your phone camera to save my contact details',
   },
 
   nav: {
@@ -89,11 +91,12 @@ export default {
       ],
     },
     laboratories: {
-      title: 'University wastewater analysis laboratories',
-      org: 'Khujand State University (KSU) and the Mining and Metallurgical Institute of Tajikistan (MMIT)',
+      title: 'University wastewater and water quality laboratories',
+      org: 'Khujand State University (KhSU), Tajik Technical University (TTU), Mining and Metallurgical Institute of Tajikistan (MMIT)',
       period: '2022 to present',
       points: [
-        'Set up wastewater analysis laboratories at two universities, the first of their kind in Tajikistan.',
+        'Set up wastewater analysis laboratories at two universities (KhSU in Khujand and TTU in Dushanbe), both accredited and the first of their kind in Tajikistan.',
+        'Set up a water quality laboratory at MMIT.',
         'Bilingual (English and Russian) laboratory protocols, including photometric methods for ammonium, nitrite and phosphate.',
         'Laboratory and wastewater analytics training with FHNW specialists (2023).',
       ],
@@ -199,7 +202,7 @@ export default {
       tsinghua: {
         year: '2024',
         title: 'Water and Wastewater Treatment Engineering: Biochemical Technology',
-        provider: 'Tsinghua University, Coursera',
+        provider: 'Tsinghua University, Coursera, verified certificate',
       },
       mitx: {
         year: '2024',

@@ -1,6 +1,8 @@
 ---
 import EmailLink from '../EmailLink.astro';
 import ProfileLinks from '../ProfileLinks.astro';
+import ContactQr from '../ContactQr.astro';
+import SaveContact from '../SaveContact.astro';
 import { getProfile, type Locale } from '../../lib/i18n';
 
 interface Props {
@@ -27,6 +29,10 @@ const t = getProfile(lang);
       </dd>
     </div>
   </dl>
+  <div class="contact__card">
+    <SaveContact lang={lang} />
+    <ContactQr lang={lang} />
+  </div>
 </div>
 
 <style>
@@ -37,6 +43,15 @@ const t = getProfile(lang);
 
   .contact__list .subhead {
     margin-block-end: var(--space-2xs);
+  }
+
+  .contact__card {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-l);
+    margin-block-start: var(--space-xl);
   }
 
   .contact__value {

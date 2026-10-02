@@ -2,7 +2,8 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { expect, test } from '@playwright/test';
 import { SITE } from '../src/config.ts';
-import { EMAIL } from '../src/data/shared.ts';
+import { EMAIL, PHONE_PARTS } from '../src/data/shared.ts';
+import { unscrambleParts } from '../src/lib/scramble.ts';
 
 // Static checks on the build. The Content Security Policy allows only
 // same-origin files, so the markup must not contain inline code or styles.
@@ -44,13 +45,69 @@ test.describe('build output', () => {
     }
   });
 
-  test('never contains the full email address', () => {
+  test('never contains the full email address or phone number', () => {
     const address = `${EMAIL.user}@${EMAIL.domain}`;
-    const files = [...htmlFiles(), ...filesEndingWith(DIST, '.js')];
+    const phone = PHONE_PARTS.join('');
+    const digits = phone.slice(1);
+    const files = [...htmlFiles(), ...filesEndingWith(DIST, '.js'), ...filesEndingWith(DIST, '.css'), ...filesEndingWith(DIST, '.xml'), ...filesEndingWith(DIST, '.txt')];
     expect(files.length).toBeGreaterThan(5);
     for (const file of files) {
-      expect.soft(readFileSync(file, 'utf8'), relative(DIST, file)).not.toContain(address);
+      const text = readFileSync(file, 'utf8');
+      expect.soft(text, relative(DIST, file)).not.toContain(address);
+      // The number, its digits from the area code on, and any spaced or dashed form
+      expect.soft(text, relative(DIST, file)).not.toContain(digits.slice(1));
+      expect.soft(text.replace(/[\s\-()]/g, ''), relative(DIST, file)).not.toContain(digits);
     }
+  });
+
+  test('pages give away neither the number nor the address when their digits or attributes are read in a row', () => {
+    const address = `${EMAIL.user}@${EMAIL.domain}`;
+    const phone = PHONE_PARTS.join('');
+    // The number with and without the country code
+    const numbers = [phone.slice(1), phone.slice(2)];
+    const decode = (value: string) =>
+      value
+        .replace(/&#x([\da-f]+);/gi, (_, hex: string) => String.fromCodePoint(Number.parseInt(hex, 16)))
+        .replace(/&#(\d+);/g, (_, dec: string) => String.fromCodePoint(Number(dec)))
+        .replace(/&quot;/g, '"')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&')
+        .replace(/%40/gi, '@');
+    const digitsOf = (text: string) => text.replace(/\D/g, '');
+    let scrambled = 0;
+    for (const file of htmlFiles()) {
+      const name = relative(DIST, file);
+      const html = readFileSync(file, 'utf8');
+      const attributes = [...html.matchAll(/\s([\w:.-]+)=(?:"([^"]*)"|'([^']*)'|([^\s"'>]+))/g)].map((match) => ({
+        name: match[1] ?? '',
+        value: decode(match[2] ?? match[3] ?? match[4] ?? ''),
+      }));
+      const text = decode(html.replace(/<[^>]*>/g, ''));
+      const streams = {
+        'all digits': digitsOf(decode(html)),
+        'all attribute digits': digitsOf(attributes.map((attribute) => attribute.value).join('')),
+        'text digits': digitsOf(text),
+      };
+      for (const [stream, digits] of Object.entries(streams)) {
+        for (const number of numbers) expect.soft(digits, `${name}: ${stream}`).not.toContain(number);
+      }
+      for (const attribute of attributes) {
+        for (const number of numbers) expect.soft(digitsOf(attribute.value), `${name}: ${attribute.name}`).not.toContain(number);
+        expect.soft(attribute.value, `${name}: ${attribute.name}`).not.toContain(address);
+      }
+      expect.soft(attributes.map((attribute) => attribute.value).join(''), `${name}: attributes in a row`).not.toContain(address);
+      expect.soft(text, `${name}: text`).not.toContain(address);
+
+      // The email parts are separate attributes; the number is stored scrambled and still decodes to itself
+      for (const attribute of attributes.filter((candidate) => candidate.name === 'data-vcard-phone')) {
+        scrambled += 1;
+        expect(attribute.value, `${name}: scrambled number`).not.toBe(JSON.stringify(PHONE_PARTS));
+        expect(unscrambleParts(attribute.value), `${name}: scrambled number`).toBe(phone);
+      }
+    }
+    // The save button is on both home pages and both CVs
+    expect(scrambled).toBe(4);
   });
 
   test('declares six font faces, Latin and Cyrillic only, all with font-display: swap', () => {

@@ -9,6 +9,12 @@ export const SHOW_AVAILABILITY = false;
 /** Split so the address never appears whole in the HTML. */
 export const EMAIL = { user: 'sodikzoda.temur', domain: 'gmail.com' } as const;
 
+/**
+ * Mobile number for WhatsApp and Telegram, in the saved contact card only.
+ * Never shown on a page; split so it never appears whole in the built files.
+ */
+export const PHONE_PARTS = ['+7', '999', '100', '80', '22'] as const;
+
 export const PROFILE_LINKS = [
   { id: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/in/tsodikzoda' },
   { id: 'researchgate', label: 'ResearchGate', href: 'https://www.researchgate.net/profile/Temur-Sodikzoda' },

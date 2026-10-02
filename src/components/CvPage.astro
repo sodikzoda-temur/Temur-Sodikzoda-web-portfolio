@@ -1,8 +1,10 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ContactQr from './ContactQr.astro';
 import EmailLink from './EmailLink.astro';
 import PrintButton from './PrintButton.astro';
 import ProfileLinks from './ProfileLinks.astro';
+import SaveContact from './SaveContact.astro';
 import Section from './Section.astro';
 import SectionLabel from './SectionLabel.astro';
 import SiteFooter from './SiteFooter.astro';
@@ -43,17 +45,23 @@ const CV_SECTIONS = [
   <main id="main" class="cv">
     <header class="cv-head reveal">
       <div class="container">
-        <p class="label">{t.cv.heading}</p>
-        <h1 class="cv-head__name">{t.hero.name}</h1>
-        <div class="cv-head__lines measure">
-          {t.hero.lines.map((line) => <p>{line}</p>)}
+        <div class="cv-head__intro">
+          <div>
+            <p class="label">{t.cv.heading}</p>
+            <h1 class="cv-head__name">{t.hero.name}</h1>
+            <div class="cv-head__lines measure">
+              {t.hero.lines.map((line) => <p>{line}</p>)}
+            </div>
+            <p class="cv-head__location label">{t.hero.location}</p>
+            {t.contact.showAvailability && <p class="cv-head__availability measure">{t.contact.availability}</p>}
+          </div>
+          <ContactQr lang={lang} />
         </div>
-        <p class="cv-head__location label">{t.hero.location}</p>
-        {t.contact.showAvailability && <p class="cv-head__availability measure">{t.contact.availability}</p>}
         <div class="cv-head__contact">
           <EmailLink lang={lang} />
           <ProfileLinks />
-          <div class="cv-head__print">
+          <div class="cv-head__actions">
+            <SaveContact lang={lang} />
             <PrintButton label={t.cv.download} />
           </div>
         </div>
@@ -125,7 +133,18 @@ const CV_SECTIONS = [
     border-top: var(--rule);
   }
 
-  .cv-head__print {
+  /* The QR code, where shown, sits beside the name and positioning lines */
+  .cv-head__intro {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-l);
+  }
+
+  .cv-head__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs) var(--space-s);
     margin-inline-start: auto;
   }
 

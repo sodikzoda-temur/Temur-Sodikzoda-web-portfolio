@@ -1,9 +1,11 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { Page } from '@playwright/test';
 import { expect, test, visit } from './fixtures';
 import { readPdf, type Element as PdfElement, type PrintedPdf } from './pdf';
+
+const HAS_PORTRAIT = existsSync(new URL('../src/assets/portrait.jpg', import.meta.url));
 
 const PAGES = [
   { name: 'cv-en', path: 'cv/', maxPages: 5, cv: true },
@@ -39,7 +41,7 @@ async function openDark(page: Page, path: string, theme: 'stored dark' | 'system
 }
 
 test.describe('print styles', () => {
-  for (const { name, path } of PAGES) {
+  for (const { name, path, cv } of PAGES) {
     for (const theme of ['stored dark', 'system dark'] as const) {
       test(`${name} in ${theme}: no site chrome, dark text on white, no backgrounds`, async ({ page }) => {
         await openDark(page, path, theme);
@@ -57,6 +59,11 @@ test.describe('print styles', () => {
         const chrome = ['.skip-link', '.site-header', '[data-menu-toggle]', '[data-theme-toggle]', '.lang-switch', '.site-footer', '[data-print]', '.hero__links'];
         for (const selector of chrome) {
           for (const element of await page.locator(selector).all()) await expect(element, selector).toBeHidden();
+        }
+        // The portrait shows on screen but never prints
+        if (HAS_PORTRAIT && !cv) {
+          await expect(page.locator('.hero__portrait')).toHaveCount(1);
+          await expect(page.locator('.hero__portrait')).toBeHidden();
         }
 
         const problems = await page.evaluate(() => {

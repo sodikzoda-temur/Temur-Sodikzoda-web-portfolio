@@ -3,10 +3,13 @@ import { getProfile, type Locale } from '../lib/i18n';
 
 interface Props {
   lang: Locale;
+  /** Both names, English first (the 404 page serves both languages). */
+  bilingual?: boolean;
 }
 
-const { lang } = Astro.props;
+const { lang, bilingual = false } = Astro.props;
 const t = getProfile(lang);
+const ru = getProfile('ru');
 const year = new Date().getFullYear();
 ---
 
@@ -20,7 +23,17 @@ const year = new Date().getFullYear();
       vector-effect="non-scaling-stroke"></path>
   </svg>
   <div class="container site-footer__inner">
-    <p class="site-footer__copy">© {year} {t.footer.copyright}</p>
+    <p class="site-footer__copy">
+      © {year} {t.footer.copyright}
+      {
+        bilingual && (
+          <>
+            {' · '}
+            <span lang="ru">{ru.footer.copyright}</span>
+          </>
+        )
+      }
+    </p>
   </div>
 </footer>
 

@@ -1,0 +1,58 @@
+---
+import { EMAIL, PHONE_PARTS } from '../data/shared';
+import { contactFields, VCARD_FILE } from '../lib/contact';
+import { scrambleParts } from '../lib/scramble';
+import { getProfile, type Locale } from '../lib/i18n';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = getProfile(lang);
+// The card is built in the browser (src/scripts/contact-card.ts) from these
+// fields, the two email parts and the scrambled phone number; neither the
+// full address nor the number is ever in the HTML, even read digit by digit.
+---
+
+<button
+  class="save-contact"
+  type="button"
+  data-vcard={JSON.stringify(contactFields(lang))}
+  data-vcard-file={VCARD_FILE}
+  data-vcard-user={EMAIL.user}
+  data-vcard-domain={EMAIL.domain}
+  data-vcard-phone={scrambleParts(PHONE_PARTS)}
+>
+  {t.ui.saveContact}
+</button>
+
+<style>
+  /* Saving needs JavaScript, so the button appears only when it can work */
+  .save-contact {
+    display: none;
+  }
+
+  :global(.js) .save-contact {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    padding-inline: var(--space-m);
+    border: 1px solid var(--brand);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--brand);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .save-contact:hover {
+    background-color: var(--tint);
+  }
+
+  @media print {
+    :global(.js) .save-contact {
+      display: none;
+    }
+  }
+</style>

@@ -55,6 +55,18 @@ and «Темур Содикзода · Резюме». These two texts are in
 `src/styles/print.css` (CSS cannot read them from the page); if my name or
 the CV heading changes, change them there too.
 
+### Contact card and QR code
+
+The home page and the CV offer my contact card ("Save contact (.vcf)") and,
+on computers, a QR code that a phone camera turns into a shorter version of
+it. The card holds my name, current role and organisation, location, email,
+mobile number (with WhatsApp and Telegram links) and profile links; the QR
+code holds the name, role, organisation, mobile number, email and the site
+address. Both are made from the data files, the card in the browser and the
+QR code when the site is built, so they follow any change there. The mobile
+number is set in `PHONE_PARTS` in `src/data/shared.ts` and appears only in the
+card and the QR code, never as text on a page.
+
 ### Portrait
 
 To show a portrait next to my name on the home page, add a square photo as
@@ -98,7 +110,9 @@ Two GitHub Actions workflows run on every push to `main`:
 - `test.yml` runs the tests in Chromium, Firefox and WebKit (also on pull
   requests).
 
-Dependabot proposes updates for npm packages and actions once a week.
+Dependabot proposes updates for npm packages and actions once a week. For npm
+packages it proposes only minor and patch versions; I upgrade major versions
+by hand.
 
 The workflows can only read the repository; only the deploy step may
 publish to Pages. Repository settings they need:
@@ -111,10 +125,10 @@ GitHub Pages cannot send custom HTTP headers, so the security policy is in a
 `frame-ancestors`, are not available; for a static site without logins or
 forms this is acceptable.
 
-## Moving to a custom domain
+## Custom domain
 
-My domain is tsodikzoda.com, with DNS at Cloudflare; the steps are the same
-for any domain.
+My domain is tsodikzoda.com, with DNS at Cloudflare. The move is done; I keep
+these steps for reference, and they are the same for any domain.
 
 1. **Verify the domain.** In my GitHub account settings (not the
    repository's) → Pages → Add a domain, enter the domain. GitHub shows a TXT

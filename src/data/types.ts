@@ -146,6 +146,10 @@ export interface UiStrings {
   /** Tag for a research focus area that is an interest, not completed work. */
   researchInterest: string;
   portraitAlt: string;
+  /** Button that downloads the contact card (.vcf). */
+  saveContact: string;
+  /** Caption and accessible name of the contact QR code. */
+  contactQr: string;
 }
 
 export interface Profile {

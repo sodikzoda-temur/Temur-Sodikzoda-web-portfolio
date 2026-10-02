@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import { getProfile, pageUrl, sectionUrl, type Locale } from '../lib/i18n';
-import { portrait } from '../lib/portrait';
+import { PORTRAIT_CROP, portrait } from '../lib/portrait';
 
 interface Props {
   lang: Locale;
@@ -33,10 +33,9 @@ const t = getProfile(lang);
             alt={t.ui.portraitAlt}
             width={480}
             height={480}
-            densities={[1, 2]}
-            fit="cover"
-            position="top"
-            format="webp"
+            widths={[256, 352, 512, 704]}
+            sizes="(min-width: 64em) 22rem, 16rem"
+            {...PORTRAIT_CROP}
             priority
           />
         </div>
@@ -116,6 +115,11 @@ const t = getProfile(lang);
     .hero {
       padding-block: 0 var(--space-m);
       background-image: none;
+    }
+
+    /* The printed page is a document, not a profile; the portrait stays on screen */
+    .hero__portrait {
+      display: none;
     }
   }
 </style>

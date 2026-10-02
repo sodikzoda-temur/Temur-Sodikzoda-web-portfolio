@@ -1,15 +1,12 @@
 import { getImage } from 'astro:assets';
 import { SITE_URL } from '../config';
 import { PROFILE_LINKS } from '../data/shared';
-import { FOCUS_IDS, type Text } from '../data/types';
+import { FOCUS_IDS } from '../data/types';
 import { absolutePageUrl, getProfile, publicUrl, type Locale } from './i18n';
-import { portrait } from './portrait';
-import { plainText } from './text';
+import { PORTRAIT_CROP, portrait } from './portrait';
+import { dataText } from './text';
 
-const WORD_JOINER = String.fromCodePoint(0x2060);
-
-/** A typeset text in data form: no-break spaces as spaces, word joiners removed. */
-const text = (value: Text): string => plainText(value).replaceAll(WORD_JOINER, '').replace(/\s+/g, ' ');
+const text = dataText;
 
 /** Open Graph locale of each language. */
 export const OG_LOCALE: Readonly<Record<Locale, string>> = { en: 'en_GB', ru: 'ru_RU' };
@@ -43,7 +40,7 @@ export async function personJsonLd(lang: Locale) {
   const other = getProfile(lang === 'en' ? 'ru' : 'en');
   const job = t.experience.isw;
   const degree = t.education.degrees.msc;
-  const image = portrait && (await getImage({ src: portrait, width: 480, height: 480, fit: 'cover', position: 'top', format: 'webp' }));
+  const image = portrait && (await getImage({ src: portrait, width: 480, height: 480, ...PORTRAIT_CROP }));
   return {
     '@context': 'https://schema.org',
     '@type': 'Person',

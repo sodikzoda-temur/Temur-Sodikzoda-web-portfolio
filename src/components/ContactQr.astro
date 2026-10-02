@@ -1,0 +1,81 @@
+---
+import qrcode from 'qrcode-generator';
+import { contactFields, emailAddress, phoneNumber } from '../lib/contact';
+import { getProfile, type Locale } from '../lib/i18n';
+import { buildVcard } from '../lib/vcard';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = getProfile(lang);
+
+// The compact card (name, role, phone, email, site) as a QR code drawn when the site is built:
+// a phone camera adds the contact without going online. The address and the
+// number are only inside the image, never written out as text.
+const card = buildVcard(contactFields(lang), emailAddress(), phoneNumber(), { compact: true });
+const qr = qrcode(0, 'M');
+// The library reads one byte per character: pass the card's UTF-8 bytes.
+qr.addData(String.fromCharCode(...new TextEncoder().encode(card)), 'Byte');
+qr.make();
+
+const QUIET = 4;
+const count = qr.getModuleCount();
+const size = count + 2 * QUIET;
+let path = '';
+for (let row = 0; row < count; row += 1) {
+  for (let col = 0; col < count; col += 1) {
+    if (qr.isDark(row, col)) path += `M${col + QUIET} ${row + QUIET}h1v1h-1z`;
+  }
+}
+---
+
+<figure class="contact-qr">
+  <svg
+    class="contact-qr__code"
+    viewBox={`0 0 ${size} ${size}`}
+    role="img"
+    aria-label={t.ui.contactQr}
+    shape-rendering="crispEdges"
+    data-modules={count}
+  >
+    <rect width={size} height={size} fill="#ffffff"></rect>
+    <path d={path} fill="#000000"></path>
+  </svg>
+  <figcaption class="contact-qr__caption" aria-hidden="true">{t.ui.contactQr}</figcaption>
+</figure>
+
+<style>
+  /* Only where a phone is the second device: wide screens with a mouse */
+  .contact-qr {
+    display: none;
+  }
+
+  @media (min-width: 64em) and (hover: hover) and (pointer: fine) {
+    .contact-qr {
+      display: flex;
+      align-items: center;
+      gap: var(--space-s);
+      margin: 0;
+    }
+  }
+
+  .contact-qr__code {
+    flex: none;
+    width: 240px;
+    height: 240px;
+  }
+
+  .contact-qr__caption {
+    max-width: 14rem;
+    color: var(--muted);
+    font-size: var(--step--1);
+  }
+
+  @media print {
+    .contact-qr {
+      display: none;
+    }
+  }
+</style>
