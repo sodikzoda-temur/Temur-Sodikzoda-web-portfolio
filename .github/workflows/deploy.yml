@@ -100,6 +100,23 @@ jobs:
             *) failed "http does not redirect to https: $redirect" ;;
           esac
 
+          # www. answers with a redirect to the domain itself (custom domains only)
+          case "$host" in
+            www.*|*.github.io) ;;
+            *)
+              for www in "http://www.$host/" "https://www.$host/"; do
+                # A 301 first; the end of the redirects is the domain over https.
+                first=$(status "$www")
+                final=$(fetch -L -o /dev/null -w '%{http_code} %{url_effective}' "$www")
+                if [ "$first" = 301 ] && [ "$final" = "200 https://$host/" ]; then
+                  pass "$www redirects to https://$host/"
+                else
+                  failed "$www: first $first, ends at $final (expected 301, then 200 https://$host/)"
+                fi
+              done
+              ;;
+          esac
+
           # Certificate valid for the host: curl verifies it. Then its subject and expiry.
           if curl -sS --retry 3 --retry-all-errors --max-time 30 -o /dev/null "$site"; then pass "certificate valid for $host"; else failed "certificate check for $host"; fi
           echo | openssl s_client -connect "$host:443" -servername "$host" 2>/dev/null | openssl x509 -noout -subject -enddate || true

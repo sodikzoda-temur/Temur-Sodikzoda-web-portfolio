@@ -4,6 +4,10 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # Only minor and patch updates; major versions are upgraded by hand.
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
     groups:
       # Astro, its checker and TypeScript move together.
       astro:
